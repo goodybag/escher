@@ -1,0 +1,19 @@
+.video-block{filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fefbc3', endColorstr='#fdc465',GradientType=0 );}
+.btn{filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#65c9d9', endColorstr='#349bbc',GradientType=0 );}
+.filter-block .heading{filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eae7a3', endColorstr='#eae7a3',GradientType=1 );}
+.drop > ul > a:hover,.drop > ul > .active > a {
+	background-position:-9999px -9999px;
+	filter: progid:dximagetransform.microsoft.alphaimageloader(src='images/bg-nav-active.png', sizingmethod='scale');
+}
+.drop .drop ul a:hover,
+.drop .drop ul .active a,
+.drop .drop .arrow{filter:none;}
+.lightbox{background:#fff;}
+.lightbox2,
+.lightbox3{background: url(../images/bg-lightbox.gif);}
+.signup-form input[type="text"],
+.signup-form input[type="password"],
+.signup-form input[type="email"],
+.login-form input[type="password"],
+.login-form input[type="email"]{filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 );}
+.btn-fb a{filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5d84d3', endColorstr='#315ab3',GradientType=0 );}
