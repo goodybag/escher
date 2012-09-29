@@ -1,1 +1,3 @@
 .DS_Store
+js/jam/*
+!js/jam/jam.json
