@@ -17,11 +17,11 @@ define(function(require){
   };
 
   logger.debug = function(){
-    console.log.apply(console, arguments);
+    console.debug.apply(console, arguments);
   };
 
   logger.warn = function(){
-    console.log.apply(console, arguments);
+    console.warn.apply(console, arguments);
   };
 
   logger.error = function(){

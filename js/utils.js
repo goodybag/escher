@@ -38,6 +38,21 @@ define(function(require){
     cache.src = path;
   };
 
+  /**
+   * Ol' boy crockfords String interpolation
+   * @param  {String} str    The string you want to interpolate with
+   * @param  {Object} values The object mapping the keys in the string to values
+   * @return {String}        The result
+   * @example
+   *   "Hello, my name is {name}", { name: "Stacy" } => "Hello, my name is Stacy."
+   */
+  utils.interpolate = function(str, values){
+    return str.replace(/{([^{}]*)}/g, function(a, b){
+      var r = values[b];
+      return typeof r === 'string' || typeof r === 'number' ? r : a;
+    });
+  };
+
   utils.http = {};
 
   /**
@@ -53,7 +68,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl +  url
+      url: config.apiUrl + url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "POST"
@@ -84,7 +99,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl +  url
+      url: config.apiUrl + url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "GET"
@@ -115,7 +130,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl +  url
+      url: config.apiUrl + url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "PUT"
@@ -146,7 +161,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl +  url
+      url: config.apiUrl + url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "DEL"

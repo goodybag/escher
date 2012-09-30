@@ -6,14 +6,28 @@ require.config({
 
 define(function(require){
   var
-    domread = require('domReady')
-  , util    = require('utils')
-  , Views   = require('views')
+    domready  = require('domReady')
+  , util      = require('utils')
+  , User      = require('models/user')
+  , Suite     = require('views/suite')
+  , apps      = require('apps')
 
   , app = {
-      view: new Views.App()
+      view: new Suite({
+        apps: apps
+      })
+    , user: new User()
     }
   ;
+
+  app.view.
+
+  // Switch apps
+  app.user.on('authenticate', function(){
+
+  });
+
+  app.user.session();
 
   app.view.render();
 
@@ -21,5 +35,5 @@ define(function(require){
     utils.dom(body).html(app.view.el);
   });
 
-  return;
+  return app;
 });
