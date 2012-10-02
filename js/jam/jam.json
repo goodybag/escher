@@ -4,6 +4,9 @@
         "jquery": null,
         "backbone": null,
         "hbt": null,
-        "domReady": null
+        "domReady": null,
+        "amanda": null,
+        "lodash": null,
+        "PubSubJS": null
     }
 }

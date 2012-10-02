@@ -4,28 +4,35 @@
 
 define(function(require){
   var
-    // 3rd Party Dependencies
+    utils   = require('utils')
+  , logger  = {}
+  , isInter = /{([^{}]*)}/
 
-    // App Dependencies
-
-    // Module Variables
-    logger = {}
+  , interpolate = function(){
+      var args = arguments;
+      // Check if we should interpolate string
+      if (typeof args["0"] === "string" && typeof args["1"] === "object" && isInter.test(args["0"])){
+        args = [utils.interpolate(args["0"], args["1"])];
+        if (arguments.length > 2) args = args.concat(Array.prototype.slice.call(arguments, 2));
+      }
+      return args;
+    }
   ;
 
   logger.info = function(){
-    console.log.apply(console, arguments);
+    console.log.apply(console, interpolate.apply({}, arguments));
   };
 
   logger.debug = function(){
-    console.debug.apply(console, arguments);
+    console.debug.apply(console, interpolate.apply({}, arguments));
   };
 
   logger.warn = function(){
-    console.warn.apply(console, arguments);
+    console.warn.apply(console, interpolate.apply({}, arguments));
   };
 
   logger.error = function(){
-    console.error.apply(console, arguments);
+    console.error.apply(console, interpolate.apply({}, arguments));
   };
 
   return logger;

@@ -2,17 +2,21 @@ define(function(require){
    var
     // 3rd Party Dependencies
     $         = require('jquery')
-  , _         = require('underscore')
+  , _         = require('lodash')
   , Backbone  = require('backbone')
+  , amanda    = require('amanda')
 
     // App Dependencies
   , config    = require('config')
+  , pubsub    = require('PubSubJS')
 
     // Module Variables
   , validator = amanda('json')
   , cachedImg = {}
   , utils     = {}
   ;
+
+  utils.noop = function(){};
 
   utils.dom = $;
 
@@ -23,6 +27,8 @@ define(function(require){
   utils.Collection = Backbone.Collection;
 
   utils = _.extend(utils, _);
+
+  utils.pubsub = pubsub;
 
   utils.getImage = function(path, callback){
     if (cachedImg[path]) return callback(null, path);

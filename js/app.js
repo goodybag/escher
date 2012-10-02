@@ -7,33 +7,34 @@ require.config({
 define(function(require){
   var
     domready  = require('domReady')
-  , util      = require('utils')
+  , utils     = require('utils')
   , User      = require('models/user')
-  , Suite     = require('views/suite')
-  , apps      = require('apps')
+  // , Router    = require('router')
+  , suite     = require('suite')
 
-  , app = {
-      view: new Suite({
-        apps: apps
-      })
-    , user: new User()
-    }
+  // , router    = new Router()
+  , user      = new User()
   ;
 
-  app.view.
+  suite.render();
+
+  // Initially throw up suite loader
 
   // Switch apps
-  app.user.on('authenticate', function(){
-
+  user.on('auth', function(){
+    if (suite) suite.openApp('consumer-panel');
   });
 
-  app.user.session();
+  user.on('de-auth', function(){
+    console.log("opening landing site");
+    if (suite) suite.openApp('landing-site');
+  });
 
-  app.view.render();
+  user.session();
 
   domready(function(){
-    utils.dom(body).html(app.view.el);
+    utils.dom(document.body).html(suite.el);
   });
 
-  return app;
+  return suite;
 });

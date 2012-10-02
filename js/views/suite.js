@@ -7,30 +7,39 @@ define(function(require){
   var
     utils     = require('utils')
   , logger    = require('logger')
-  , templates = require('templates')
+    // App Views
+  , LandingSite   = require('apps/landing-site/app')
+  , ConsumerPanel = require('apps/consumer-panel/app')
   ;
 
   return utils.View.extend({
     className: "suite"
 
-  , initialize: function(options){
-      this.user    = options.user;
-      /**
-       * Holds the app definitions and instances
-       */
-      this.apps    = {};
+    /**
+     * App Definitions
+     */
+  , apps: {
+      'consumer-panel': ConsumerPanel
+    , 'landing-site':   LandingSite
+    }
 
+    /**
+     * Keeps track of which apps have been instantiated
+     */
+  , instantiated: {}
+
+  , initialize: function(options){
       /**
        * Current open application
        */
       this.current = null;
       this.numApps = 0;
 
-      // Setup apps
-      for (var i = options.apps.length - 1; i >= 0; i--){
-        this.addApp(options.apps[i]);
-      }
+      return this;
+    }
 
+  , render: function(){
+      this.$el.html('<div class="apps" />');
       return this;
     }
 
@@ -44,11 +53,8 @@ define(function(require){
      *   }
      */
   , addApp: function(app){
-      this.apps[app.name] = utils.extend({
-        instantiated: null
-      , _id: this.numApps++
-      , View: app.view || app.View
-      }, app);
+      if (this.appInstantiated(app)) this.destroyApp(app);
+      this.apps[app.name] = app;
       return this;
     }
 
@@ -60,29 +66,39 @@ define(function(require){
 
   , closeApp: function(appName){
       if (!this.appExists(appName))
-        return logger.warn(utils.interpolate("App {app} does not exist", { app: appName })), this;
+        return logger.warn("App {app} does not exist", { app: appName }), this;
       if (!this.appInstantiated(appName))
-        return logger.warn(utils.interpolate("App {app} is not instantiated", { app: appName })), this;
-      this.apps[appName].close();
+        return logger.warn("App {app} is not instantiated", { app: appName }), this;
+      this.instantiated[appName].close();
       if (this.current.name === appName) this.current = null;
     }
 
   , openApp: function(appName){
       if (!this.appExists(appName))
-        return logger.warn(utils.interpolate("App {app} does not exist", { app: appName })), this;
+        return logger.warn("App {app} does not exist", { app: appName }), this;
+
+      // Close the current application
       if (this.current) this.closeCurrent();
-      this.current = this.apps[appName];
-      if (!this.current.instantiated) this.instantiateApp(appName)
+
+      // Instantiate, render, and add to the dom if we haven't already
+      if (!this.appInstantiated(appName)){
+        this.instantiateApp(appName);
+        this.current = this.instantiated[appName];
+        this.current.render();
+        this.$el.find('.apps').append(this.current.$el);
+      } else this.current = this.instantiated[appName];
+
+      // Check to see if the app has a page open - open the initial if not
+      if (!this.current.current) this.current.openPage(this.current.initial);
       this.current.open();
       return this;
     }
 
   , destroyApp: function(appName){
       if (!this.appExists(appName))
-        return logger.warn(utils.interpolate("App {app} does not exist", { app: appName })), this;
-      var app = this.apps[appName];
-      app.destroy();
-      app.instantiated = null;
+        return logger.warn("App {app} does not exist", { app: appName }), this;
+      this.instantiated[appName].destroy();
+      this.instantiated[appName] = null;
       return this;
     }
 
@@ -91,20 +107,17 @@ define(function(require){
     }
 
   , appInstantiated: function(appName){
-      return !!this.apps[appName].instantiated;
+      return !!this.instantiated[appName];
     }
 
   , instantiateApp: function(appName){
-      var app     = this.apps[appName];
-      app.instantiated = new app.View({ user: this.user });
-      // Proxy some functions for convenience
-      app.open    = app.instantiated.open;
-      app.isOpen  = app.instantiated.isOpen;
-      app.close   = app.instantiated.close;
-      app.render  = app.instantiated.render;
-      app.destroy = app.instantiated.destroy;
-      app.on      = app.instantiated.on;
-      app.off     = app.instantiated.off;
+      if (!this.appExists(appName)){
+        logger.warn("[Suite.instantiateApp] - App {app} does not exist");
+        return this;
+      }
+      if (this.appInstantiated(appName)) this.destroyApp(appName);
+      this.instantiated[appName] = new this.apps[appName]();
+
       return this;
     }
   });

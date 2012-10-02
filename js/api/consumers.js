@@ -5,7 +5,7 @@ define(function(require){
     // App Dependencies
     utils     = require('utils')
   , config    = require('config')
-  , schemas   = require('schemas')
+  , schema    = require('schemas/consumer')
   , logger    = require('logger')
 
     // Module Variables
@@ -18,7 +18,7 @@ define(function(require){
    * @return {null}
    */
   consumers.session = function(callback){
-    utils.get('consuemrs/auth', callback);
+    utils.get('consumers/auth', callback);
   };
 
   consumers.fbAuth = function(accessToken, callback){
@@ -26,14 +26,14 @@ define(function(require){
   };
 
   consumers.register = function(data, callback){
-    utils.validate(data, schemas.consumer.register, function(errors){
+    utils.validate(data, schema.register, function(errors){
       if (errors) return callback(errors);
       utils.post('consumers', data, callback);
     });
   };
 
   consumers.auth = function(data, callback){
-    utils.validate(data, schemas.consumer.auth, function(errors){
+    utils.validate(data, schema.auth, function(errors){
       if (errors) return callback(errors);
       utils.post('consumers/auth', data, callback);
     });
