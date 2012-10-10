@@ -7,6 +7,7 @@
         "domReady": null,
         "amanda": null,
         "lodash": null,
-        "PubSubJS": null
+        "PubSubJS": null,
+        "backbone.subroute": null
     }
 }

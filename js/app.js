@@ -16,6 +16,15 @@ define(function(require){
   , user      = new User()
   ;
 
+  new utils.Router({
+    routes: { '': 'redirect' }
+  , redirect: function(){
+      console.log('poop');
+      utils.Backbone.history.navigate('site');
+    }
+  });
+  utils.Backbone.history.start({ root: '/' });
+
   suite.render();
 
   // Initially throw up suite loader
@@ -26,7 +35,6 @@ define(function(require){
   });
 
   user.on('de-auth', function(){
-    console.log("opening landing site");
     if (suite) suite.openApp('landing-site');
   });
 

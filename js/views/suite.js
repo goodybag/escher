@@ -19,8 +19,15 @@ define(function(require){
      * App Definitions
      */
   , apps: {
-      'consumer-panel': ConsumerPanel
-    , 'landing-site':   LandingSite
+      'consumer-panel': {
+        constructor: ConsumerPanel
+      , baseUrl: 'panel'
+      }
+
+    , 'landing-site': {
+        constructor: LandingSite
+      , baseUrl: 'site'
+      }
     }
 
     /**
@@ -116,7 +123,9 @@ define(function(require){
         return this;
       }
       if (this.appInstantiated(appName)) this.destroyApp(appName);
-      this.instantiated[appName] = new this.apps[appName]();
+      this.instantiated[appName] = new this.apps[appName].constructor({
+        baseUrl: this.apps[appName].baseUrl
+      });
 
       return this;
     }

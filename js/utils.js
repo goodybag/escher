@@ -20,11 +20,16 @@ define(function(require){
 
   utils.dom = $;
 
+  require('backbone.subroute');
+
+  utils.Backbone   = Backbone;
   utils.Events     = Backbone.Events;
   utils.Router     = Backbone.Router;
+  utils.SubRouter  = Backbone.SubRoute;
   utils.Model      = Backbone.Model;
   utils.View       = Backbone.View;
   utils.Collection = Backbone.Collection;
+  utils.History    = Backbone.History;
 
   utils = _.extend(utils, _);
 
