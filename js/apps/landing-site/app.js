@@ -21,31 +21,30 @@ define(function(require){
   ;
 
   return App.extend({
-    initialize: function(options){
+    Router: Router
+
+  , initialize: function(options){
+      this.name = "landing-site";
+
       this.baseUrl = options.baseUrl;
 
-      this.router = new Router(this.baseUrl, {
-        app: this
-      , createTrailingSlashRoutes: true
-      });
+      // Create the router if nobody has done it for us already
+      if (!this.router){
+        this.router = new this.Router(this.baseUrl || "", {
+          app: this
+        , createTrailingSlashRoutes: true
+        });
+      }
 
       this.template = template;
 
-      // this.pages = {
-      //   'landing':      Pages.Landing
-      // , 'charities':    Pages.Charities
-      // , 'legal':        Pages.Legal
-      // , 'privacy':      Pages.Privacy
-      // , 'businesses':   Pages.Businesses
-      // };
-
       // These pages only load if we create an instance of the app
       this.pages = {
-        landing:      require('./views/landing-page')
-      , charities:    require('./views/charities-page')
-      , legal:        require('./views/legal-page')
-      , privacy:      require('./views/privacy-page')
-      , businesses:   require('./views/businesses-page')
+        landing:      'landing-page'
+      , charities:    'charities-page'
+      , legal:        'legal-page'
+      , privacy:      'privacy-page'
+      , businesses:   'businesses-page'
       };
 
       this.initial = 'landing';
@@ -75,9 +74,11 @@ define(function(require){
     }
 
   , openPage: function(pageName){
+      if (pageName === this.current) return this;
       // Special stuff for landing page
       if (pageName === "landing"){
         utils.dom(document.body).addClass('index');
+        this.children.footer.show();
         this.children.footer.exitSlideMode();
       }else{
         utils.dom(document.body).removeClass('index');

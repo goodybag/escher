@@ -17,6 +17,48 @@ define(function(require){
       return this;
     }
 
+    // download page assets for app
+  , loadPages: function(callback){
+      var
+        _this       = this
+      , pages       = 0
+      , pagesLoaded = 0
+      , pathTmpl    = "apps/{app}/views/{page}"
+      , path
+
+      , loadPage = function(pageName, pagePath){
+          require([pagePath], function(pageView){
+            _this.pages[pageName] = pageView;
+            if (++pagesLoaded === pages){
+              logger.info("[App] - Pages ", _this.pages);
+              callback();
+            }
+          });
+        }
+      ;
+
+      // First count the pages
+      for (var page in this.pages){
+        if (page in this.pages) pages++;
+      }
+
+      // Load pages
+      for (var page in this.pages){
+        if (page in this.pages){
+          // Path to the page module
+          path = utils.interpolate(pathTmpl, {
+            app: this.name
+          , page: this.pages[page]
+          });
+
+          logger.info("[App] - Requiring ", path);
+
+          // Require the page module
+          loadPage(page, path);
+        }
+      }
+    }
+
   , openPage: function(pageName){
       if (!this.pageExists(pageName))
         return logger.warn("[App.openPage] - Page {page} does not exist", { page: pageName }), this;

@@ -13,7 +13,7 @@ define(function(require){
 
   , render: function(){
       this.el.innerHTML = this.template();
-      return this;gx
+      return this;
     }
 
   , open: function(){

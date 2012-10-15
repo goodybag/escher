@@ -3,7 +3,7 @@ define(function(require){
     utils = require('utils')
   ;
 
-  return utils.SubRouter.extend({
+  return utils.Router.extend({
     initialize: function(options){
       this.app = options.app;
     }
