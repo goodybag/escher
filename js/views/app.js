@@ -19,9 +19,14 @@ define(function(require){
   , apps: {}
 
   /**
-   * Open applications
+   * Page definitions
    */
-  , open: {}
+  , Pages: {}
+
+  /**
+   * Instantiated pages
+   */
+  , pages: {}
 
   /**
    * Module dependencies to load
@@ -120,7 +125,6 @@ define(function(require){
 
       // Instantiate, render, and add to the dom if we haven't already
       if (!this.appInstantiated(appName)){
-
         var _this = this, options = {};
 
         this.instantiateApp(appName, function(){
@@ -190,6 +194,77 @@ define(function(require){
         return logger.warn("[App.destroyApp] - App {app} does not exist", { app: appName }), this;
       this.apps[appName].destroy();
       this.apps[appName] = null;
+      return this;
+    }
+
+  , addPage: function(page){
+      if (this.pageInstantiated(page)) this.destroyPage(page);
+      this.pages[page.name] = page;
+      return this;
+    }
+
+  , openPage: function(pageName){
+      if (!this.pageExists(pageName))
+        return logger.warn("[App.openPage] - Page {page} does not exist", { page: pageName }), this;
+
+      // Close the current page
+      if (this.current) this.closeCurrent();
+
+      // Instantiate, render, and add to the dom if we haven't already
+      if (!this.pageInstantiated(pageName)){
+        logger.info("[App.openPage] - Instantiating Page {page}", { page: pageName });
+        this.instantiatePage(pageName);
+        this.current = this.pages[pageName];
+        this.current.render();
+        this.$el.find('.pages').append(this.current.$el);
+      } else this.current = this.pages[pageName];
+
+      this.current.open();
+      return this;
+    }
+
+  , closeCurrent: function(){
+      if (!this.current) return logger.warn("[App.closeCurrent] - There is no page open"), this;
+      this.current.close();
+      return this;
+    }
+
+  , closePage: function(pageName){
+      if (!this.pageExists(pageName))
+        return logger.warn("[App.closePage] - Page {page} does not exist", { page: pageName }), this;
+      if (!this.pageInstantiated(pageName))
+        return logger.warn("[App.closePage] - Page {page} is not instantiated", { page: pageName }), this;
+      this.pages[pageName].close();
+      if (this.current.name === pageName) this.current = null;
+      return this;
+    }
+
+  , pageExists: function(pageName){
+      return !!this.Pages[pageName];
+    }
+
+  , pageInstantiated: function(pageName){
+      return !!this.pages[pageName];
+    }
+
+  , instantiatePage: function(pageName){
+      if (!this.pageExists(pageName)){
+        logger.warn("[App.instantiatePage] - Page {page} does not exist");
+        return this;
+      }
+      if (this.pageInstantiated(pageName)) this.destroyPage(pageName);
+      this.pages[pageName] = new this.Pages[pageName]({
+
+      });
+
+      return this;
+    }
+
+  , destroyPage: function(pageName){
+      if (!this.pageExists(pageName))
+        return logger.warn("[App.destroyPage] - Page {page} does not exist", { page: pageName }), this;
+      this.pages[pageName].destroy();
+      this.pages[pageName] = null;
       return this;
     }
 

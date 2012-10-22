@@ -29,7 +29,7 @@ define(function(require){
         Nav:    './nav'
       , Footer: './footer'
       }
-    , pages: {
+    , Pages: {
         landing:      './landing-page'
       , charities:    './charities-page'
       , legal:        './legal-page'
@@ -39,10 +39,16 @@ define(function(require){
     }
 
   , initialize: function(options){
+      var this_ = this;
+
       this.baseUrl = options.baseUrl;
       this.initial = 'landing';
 
-      this.loadDependencies(options.onReady);
+      this.loadDependencies(function(){
+        this_.children.nav = new this_.children.Nav();
+        this_.children.footer = new this_.children.Footer();
+        options.onReady();
+      });
 
       return this;
     }
@@ -51,8 +57,6 @@ define(function(require){
       this.children.nav.render();
       this.children.footer.render();
 
-      this.apps['business-listing'].render();
-      this.$el.append(this.apps['business-listing'].$el);
       if (this.current) this.current.render();
       return this;
     }
@@ -61,6 +65,7 @@ define(function(require){
       logger.info("[Landing Site] - logo click");
     }
 
+    // Override the default openPage to add in specific page logic
   , openPage: function(pageName){
       if (pageName === this.current) return this;
       // Special stuff for landing page

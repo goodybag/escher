@@ -157,7 +157,6 @@ define(function(require){
 
       // Once the app has been instantiated, pages loaded, rendered, and appended
       var goodToGo = function(){
-        // Check to see if the app has a page open - open the initial if not
         if (!_this.current.current) _this.current.openPage(_this.current.initial);
         _this.current.open();
         callback();
