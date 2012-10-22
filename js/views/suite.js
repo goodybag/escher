@@ -7,66 +7,66 @@ define(function(require){
   var
     utils     = require('utils')
   , logger    = require('logger')
-    // App Views
-  , LandingSite   = require('apps/landing-site/app')
-  , ConsumerPanel = require('apps/consumer-panel/app')
+  , App       = require('views/app')
   ;
 
-  return utils.View.extend({
+  return App.extend({
     className: "suite"
 
-    /**
-     * Keeps track of which apps have been instantiated
-     */
-  , instantiated: {}
-
   , initialize: function(options){
+      var ensureOpen = function(appName){
+        return function(){
+          _this.openApp(appName, Array.prototype.slice.call(arguments, arguments.length - 1));
+        };
+      };
+
       /**
        * Current open application
        */
       this.current = null;
 
-      var ensureOpen = function(appName){
-        return function(){
-          var next = Array.prototype.slice.call(arguments, arguments.length - 1);
-          _this.openApp(appName, next);
-        };
+      this.Apps = {
+        'landing-site': {
+          baseUrl: 'landing'
+        , middleware: [ensureOpen('landing-site')]
+        }
+      , 'consumer-panel': {
+          baseUrl: 'panel'
+        }
       };
 
       /**
        * App Definitions
        */
-      this.apps = {
-        'consumer-panel': {
-          constructor: ConsumerPanel
-        , baseUrl: 'panel'
-        , middleware: [
-            // Make sure we're logged in
-            function(){
-              // We don't know what parameters might be getting passed to route
-              var next = Array.prototype.slice.call(arguments, arguments.length - 1);
-              // Ensure we're logged in
-              // user.isLoggedIn()
-              // If not, re-direct to login and update hash
-              // this.openApp('landing-site');
-              // Backbone.history.navigate('/apps/landing')
-              // If yes, open the app
-              // this.openApp('consumer-panel', function(){ next() })
-            }
+      // this.apps = {
+      //   'consumer-panel': {
+      //     constructor: ConsumerPanel
+      //   , baseUrl: 'panel'
+      //   , middleware: [
+      //       // Make sure we're logged in
+      //       function(){
+      //         // We don't know what parameters might be getting passed to route
+      //         var next = Array.prototype.slice.call(arguments, arguments.length - 1);
+      //         // Ensure we're logged in
+      //         // user.isLoggedIn()
+      //         // If not, re-direct to login and update hash
+      //         // this.openApp('landing-site');
+      //         // Backbone.history.navigate('/apps/landing')
+      //         // If yes, open the app
+      //         // this.openApp('consumer-panel', function(){ next() })
+      //       }
 
-            // Make sure the app is open
-          , ensureOpen('consumer-panel')
-          ]
-        }
+      //       // Make sure the app is open
+      //     , ensureOpen('consumer-panel')
+      //     ]
+      //   }
 
-      , 'landing-site': {
-          constructor: LandingSite
-        , baseUrl: 'site'
-        , middleware: [ ensureOpen('landing-site') ]
-        }
-      };
-
-      this.setupApps();
+      // , 'landing-site': {
+      //     constructor: LandingSite
+      //   , baseUrl: 'site'
+      //   , middleware: [ ensureOpen('landing-site') ]
+      //   }
+      // };
 
       return this;
     }
@@ -194,9 +194,45 @@ define(function(require){
         baseUrl: this.apps[appName].baseUrl
       });
 
-      this.instantiated[appName].loadPages(callback);
-
       return this;
     }
   });
 });
+
+/**
+ * Given an App, it instantiaes sub-routers for all sub-apps and the sub-apps Apps
+ * @param  {Object} ParentApp The top-level app
+ */
+var evaluateRouter = function(ParentApp){
+  var ChildApp, Router, routes, route;
+  for (var key in ParentApp.Apps){
+    ChildApp = ParentApp.Apps[key];
+    // Check to see if there are any routes to evaluate on this app
+    if (ChildApp.hasOwnProperty('Router')){
+      // Mixin the middleware from parent app
+      if (ParentApp.middleware && ParentApp.middleware.length > 0){
+        routes = ChildApp.Router.routes;
+        for (var routeName in routes){
+          if (!routes.hasOwnProperty(routeName)) continue;
+          route = routes[routeName];
+          // If the route wasn't using middleware already, put it in an array to work with
+          if (typeof route === "string") routes[routeName] = [route];
+          // Prepend the Parent's middleware
+          Array.prototype.unshift.apply(routes[route], ParentApp.middleware);
+        }
+      }
+      // Create new sub-router
+      Router = utils.SubRouter.extend(ChildApp.Router);
+      ChildApp.router = new Router(ChildApp.baseUrl, {
+        createTrailingSlashRoutes: true
+      });
+      // Attach to app constructor prototype for convenience use in different scope
+      ChildApp.constructor.prototype.router = ChildApp.router;
+    }
+    // Does the child have children?
+    if (ChildApp.hasOwnProperty('Apps')){
+      // Run through the process for all apps
+      evaluateRouter(ChildApp);
+    }
+  };
+};

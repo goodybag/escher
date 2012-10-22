@@ -8,6 +8,7 @@
         "amanda": null,
         "lodash": null,
         "PubSubJS": null,
-        "backbone.subroute": null
+        "backbone.subroute": null,
+        "async": null
     }
 }

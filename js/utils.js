@@ -5,6 +5,7 @@ define(function(require){
   , _         = require('lodash')
   , Backbone  = require('backbone')
   , amanda    = require('amanda')
+  , async     = require('async')
 
     // App Dependencies
   , config    = require('config')
@@ -32,6 +33,7 @@ define(function(require){
   utils.History    = Backbone.History;
 
   utils = _.extend(utils, _);
+  utils = _.extend(utils, async);
 
   utils.pubsub = pubsub;
 

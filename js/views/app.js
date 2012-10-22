@@ -1,124 +1,195 @@
 define(function(require){
   var
-    utils     = require('utils')
-  , logger    = require('logger')
+    utils       = require('utils')
+  , logger      = require('logger')
+  , appHandler  = require('apps-handler')
   ;
 
   return utils.View.extend({
     className: 'app'
 
-  , pages: {}
-  , instantiated: {}
-  , current: null
+  /**
+   * Application definitions
+   */
+  , Apps: {}
 
-  , addPage: function(page){
-      if (this.pageInstantiated(page)) this.destroyPage(page);
-      this.pages[page.name] = page;
-      return this;
-    }
+  /**
+   * Instantiated applications
+   */
+  , apps: {}
 
-    // download page assets for app
-  , loadPages: function(callback){
+  /**
+   * Open applications
+   */
+  , open: {}
+
+  /**
+   * Module dependencies to load
+   */
+  , dependencies: {}
+
+  , loadDependencies: function(callback){
       var
-        _this       = this
-      , pages       = 0
-      , pagesLoaded = 0
-      , pathTmpl    = "apps/{app}/views/{page}"
-      , path
+        this_     = this
+      , dependex  = {}
+      , depends   = []
 
-      , loadPage = function(pageName, pagePath){
-          require([pagePath], function(pageView){
-            _this.pages[pageName] = pageView;
-            if (++pagesLoaded === pages){
-              logger.info("[App] - Pages ", _this.pages);
-              callback();
+      , flattenDepends = function(dependencies){
+          var dependency;
+          for (var key in dependencies){
+            dependency = dependencies[key];
+            if (typeof dependency === "string"){
+              dependex[key] = depends.push(dependency) - 1;
+            }else if (typeof dependency === "object"){
+              flattenDepends(dependency);
             }
-          });
+          }
         }
       ;
 
-      // First count the pages
-      for (var page in this.pages){
-        if (page in this.pages) pages++;
-      }
+      // Require templates and child views
+      utils.parallel({
+        depends: function(done){
+          require(depends, function(){
+            var
+              args = Array.prototype.slice.call(arguments, 0)
 
-      // Load pages
-      for (var page in this.pages){
-        if (page in this.pages){
-          // Path to the page module
-          path = utils.interpolate(pathTmpl, {
-            app: this.name
-          , page: this.pages[page]
+            , applyDepends = function(context, dependencies){
+                var dependency;
+                for (var key in dependencies){
+                  dependency = dependencies[key];
+                  if (typeof dependency === "string"){
+                    context[key] = args[dependex[key]];
+                  }else if (typeof dependency === "object"){
+                    context[key] = {};
+                    applyDepends(context[key], dependency);
+                  }
+                }
+              }
+            ;
+
+            applyDepends(_this, _this.dependencies);
+            done();
           });
-
-          logger.info("[App] - Requiring ", path);
-
-          // Require the page module
-          loadPage(page, path);
         }
+      , apps: function(done){
+          this.initApps(done);
+        }
+      }, callback);
+    }
+
+  , initApps: function(callback){
+      var _this = this, numApps = 0, appsLoaded = 0;
+
+      // Count apps that have not bee instantiated yet
+      for (var name in this.Apps) if (!this.apps[name]) numApps++;
+
+      // Instantiate Apps
+      for (var name in this.Apps){
+        // Don't re-instantiate apps
+        if (!!this.apps[name]) continue;
+
+        appHandler.get(name, function(error, app){
+          if (error) return logger.error(error), callback(error);
+          _this.apps[name] = new app.View({
+            onReady: function(){
+              // Call the original onReadyFunction
+              if (_this.Apps[name].onReady) _this.Apps[name].onReady.call(_this.apps[name]);
+              if (++appsLoaded === numApps){
+                callback();
+              }
+            }
+          });
+        });
       }
     }
 
-  , openPage: function(pageName){
-      if (!this.pageExists(pageName))
-        return logger.warn("[App.openPage] - Page {page} does not exist", { page: pageName }), this;
+  , addApp: function(App){
+      if (this.appInstantiated(App)) this.destroyApp(App);
+      this.Apps[app.name] = app;
+      return this;
+    }
 
-      // Close the current page
-      if (this.current) this.closeCurrent();
+  , openApp: function(appName, callback){
+      if (!this.appExists(appName))
+        return logger.warn("App {app} does not exist", { app: appName }), this;
+
+      callback = callback || utils.noop;
+
+      var app, App = this.Apps[appName];
 
       // Instantiate, render, and add to the dom if we haven't already
-      if (!this.pageInstantiated(pageName)){
-        logger.info("[App.openPage] - Instantiating Page {page}", { page: pageName });
-        this.instantiatePage(pageName);
-        this.current = this.instantiated[pageName];
-        this.current.render();
-        this.$el.find('.pages').append(this.current.$el);
-      } else this.current = this.instantiated[pageName];
+      if (!this.appInstantiated(appName)){
 
-      this.current.open();
+        var _this = this, options = {};
+
+        this.instantiateApp(appName, function(){
+          app = _this.apps[appName];
+          app.render();
+          goodToGo();
+        });
+      }else{
+        goodToGo();
+      }
+
+      // Once the app has been instantiated, pages loaded, rendered, and appended
+      var goodToGo = function(){
+        // Check to see if the app has a page open - open the initial if not
+        if (!_this.current.current) _this.current.openPage(_this.current.initial);
+        _this.current.open();
+        callback();
+      };
+
       return this;
     }
 
-  , closeCurrent: function(){
-      if (!this.current) return logger.warn("[App.closeCurrent] - There is no page open"), this;
-      this.current.close();
+  , closeApp: function(appName){
+      if (!this.appExists(appName))
+        return logger.warn("App {app} does not exist", { app: appName }), this;
+      if (!this.appInstantiated(appName))
+        return logger.warn("App {app} is not instantiated", { app: appName }), this;
+      this.apps[appName].close();
       return this;
     }
 
-  , closePage: function(pageName){
-      if (!this.pageExists(pageName))
-        return logger.warn(utils.interpolate("[App.closePage] - Page {page} does not exist", { page: pageName })), this;
-      if (!this.pageInstantiated(pageName))
-        return logger.warn(utils.interpolate("[App.closePage] - Page {page} is not instantiated", { page: pageName })), this;
-      this.pages[pageName].close();
-      if (this.current.name === pageName) this.current = null;
-      return this;
+  , appExists: function(appName){
+      return !!this.apps[appName];
     }
 
-  , pageExists: function(pageName){
-      return !!this.pages[pageName];
+  , appInstantiated: function(appName){
+      return !!this.Apps[appName];
     }
 
-  , pageInstantiated: function(pageName){
-      return !!this.instantiated[pageName];
-    }
-
-  , instantiatePage: function(pageName){
-      if (!this.pageExists(pageName)){
-        logger.warn("[App.instantiatePage] - Page {page} does not exist");
+  , instantiateApp: function(appName, callback){
+      if (!this.appExists(appName)){
+        logger.warn("[App.instantiateApp] - App {app} does not exist", { app: appName });
         return this;
       }
-      if (this.pageInstantiated(pageName)) this.destroyPage(pageName);
-      this.instantiated[pageName] = new this.pages[pageName]({ user: this.user });
+
+      if (this.appInstantiated(appName)){
+        logger.warn("[App.instantiateApp] - App {app} has already been instantiated", { app: appName });
+        return this;
+      }
+
+      var App = this.Apps[appName];
+
+      this.apps[appName] = new App.constructor({
+        // Convenience in case the app needs to know
+        baseUrl:  (this.baseUrl || "") + App.baseUrl
+        // Attach the app to the defined element
+      , $el:      App.$el
+        // Whenever the app has finished loading resources
+      , appReady: callback
+      });
 
       return this;
     }
 
-  , destroyPage: function(pageName){
-      if (!this.pageExists(pageName))
-        return logger.warn("[App.destroyPage] - Page {page} does not exist", { page: pageName }), this;
-      this.instantiated[pageName].destroy();
-      this.instantiated[pageName] = null;
+  , destroyApp: function(appName){
+      if (!this.appExists(appName))
+        return logger.warn("[App.destroyApp] - App {app} does not exist", { app: appName }), this;
+      this.apps[appName].destroy();
+      this.apps[appName] = null;
       return this;
     }
 
