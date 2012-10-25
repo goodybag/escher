@@ -23,6 +23,8 @@ define(function(require){
     //   }
     }
 
+  , baseUrl: 'apps/landing-site/'
+
   , dependencies: {
       template: 'hbt!./templates/app'
     , children: {
