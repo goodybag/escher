@@ -13,6 +13,7 @@ While the project is far from complete and is still very mutable, we should keep
 * It should cut down development time
 * Require.js and Backbone should both be used
 * Applications can be composed of other applications and are embedded in one another
+* It should feel as close to regular development as possible. The developer should feel like they've got a handle on the job of all of the pieces and rarely do things go into a black box.
 
 ## What's the difference?
 
