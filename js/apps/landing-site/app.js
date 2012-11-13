@@ -1,36 +1,11 @@
 define(function(require){
-  var AppView = require('./views/app');
-
   return {
-    constructor: AppView
+    appViewPath: './views/app'
 
-  , Router: {
-      initialize: function(options){
-        this.app = options.app;
-      }
+  , router: require('./router')
 
-    , routes: {
-        "":                   "landing"
-      , "charities":          "charities"
-      , "businesses":         "businesses"
-      , "legal":              "legal"
-      , "privacy":            "privacy"
-      }
+  , permissions: {
 
-    , landing: function(){
-        // this.app.openPage('landing');
-        console.log("lkajsdflaksjdf laksdjflasdkfjaksdflkajsjfjasdlfasdjflkasdkfj");
-      }
-
-    , charities: function(){
-        // this.app.openPage('landing');
-        console.log("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-      }
-
-    , businesses: function(){
-        // this.app.openPage('landing');
-        console.log("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
-      }
     }
   };
 });

@@ -4,6 +4,9 @@ define(function(require){
   , errors  = require('errors')
   ;
 
+  /**
+   * Singleton in the hizzy!
+   */
   return new (function(){
     var constructor = function(){
       this.apps   = {};
@@ -12,10 +15,10 @@ define(function(require){
     };
 
     constructor.prototype {
-      add: function(path, name){
-        if (!path) throw new Error('Need to specify path when creating an app');
-        name = name || path;
-        this.apps[name] = path;
+      add: function(name, package){
+        if (!name) throw new Error('Need to specify name when creating an app');
+        if (!package) throw new Error('Need to specify package when creating an app');
+        this.apps[name] = package;
         return this;
       }
 
@@ -23,13 +26,13 @@ define(function(require){
        * Retreives an app module - downloads the resources if needed
        * @param  {String}   name     Name of the module
        * @param  {Function} callback Callback when the module has been received
-       * @return {Object}            Instance of of the AppHandler object
+       * @return {Object}            Instance of the AppHandler object
        */
     , get: function(name, callback){
         if (!this.loaded(name)){
           var this_ = this;
-          return require([this.apps[name]], function(module){
-            _this[loaded] = module;
+          return require([this.apps[path]], function(module){
+            this_.loaded[name] = module;
             callback(null, module);
           }), this;
         }

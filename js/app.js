@@ -19,8 +19,10 @@ define(function(require){
 
   // Add applications to registry
   for (var i = apps.length - 1; i >= 0; i--) {
-    appsHandler.add(apps[i].path, apps[i].name);
+    appsHandler.add(apps[i]);
   };
+
+  appsHandler.get('suite', function())
 
   // Setup a base router
   new utils.Router({

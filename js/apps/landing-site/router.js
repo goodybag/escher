@@ -1,9 +1,5 @@
 define(function(require){
-  var
-    utils = require('utils')
-  ;
-
-  return utils.Router.extend({
+  return {
     initialize: function(options){
       this.app = options.app;
     }
@@ -30,5 +26,5 @@ define(function(require){
       // this.app.openPage('landing');
       console.log("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
     }
-  });
+  }
 });

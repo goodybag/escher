@@ -1,12 +1,16 @@
 define(function(require){
   return [
     {
+      name: "suite"
+    , package: require('apps/suite/app')
+    }
+  , {
       name: "landing-site"
-    , path: 'apps/landing-site/app'
+    , package: require('apps/landing-site/app')
     }
   , {
       name: "consumer-panel"
-    , path: 'apps/consumer-panel/app'
+    , package: require('apps/consumer-panel/app')
     }
   ];
 });
