@@ -81,7 +81,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl + url
+      url: url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "POST"
@@ -112,7 +112,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl + url
+      url: url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "GET"
@@ -143,7 +143,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl + url
+      url: url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "PUT"
@@ -174,7 +174,7 @@ define(function(require){
       data = {};
     }
     return utils.req({
-      url: config.apiUrl + url
+      url: url
     , dataType: 'json'
     , contentType: "application/json; charset=UTF-8"
     , type: "DEL"
