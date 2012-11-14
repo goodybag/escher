@@ -25,12 +25,12 @@ Typically, you will setup your directory structure with something like this:
 
 ```
 - apps/
-    - application-1
-      - collections
-      - models
-      - styles
-      - templates
-      - views
+    - application-1/
+      - collections/
+      - models/
+      - styles/
+      - templates/
+      - views/
         app.js        // Main application view
       app.js          // Application manifest file
 ```
