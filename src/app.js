@@ -1,8 +1,8 @@
 define(function(require){
   var
-    utils       = require('utils')
-  , logger      = require('logger')
-  , appHandler  = require('apps-handler')
+    utils       = require('./utils')
+  , logger      = require('./logger')
+  , appHandler  = require('./apps-handler')
   ;
 
   return utils.View.extend({
@@ -92,12 +92,25 @@ define(function(require){
       , appName
       ;
 
+      /**
+       * Could probably re-factor these two loops
+       * Create a new object based on the counting loop
+       * And just loop through that in the instantiate loop
+       */
+
       // Count apps that have not bee instantiated yet
-      for (var name in Apps) if (!this.apps[name]) numApps++;
+      for (var name in Apps){
+        // Don't load apps that want to be deferred
+        if (appName.indexOf('defer!')) continue;
+        // Don't count apps already instantiated
+        if (this.apps[name]) continue;
+
+        numApps++;
+      }
 
       // Instantiate Apps
-      for (var appVarName in ){
-        appName = this._packages.apps[appVarName];
+      for (var i = Apps.length - 1; i >= 0; i--){
+        appName = Apps[i].name;
 
         // Don't re-instantiate apps
         if (this.apps[name]) continue;
@@ -105,19 +118,17 @@ define(function(require){
         // Don't load apps that want to be deferred
         if (appName.indexOf('defer!')) continue;
 
-        appHandler.get(name, function(error, app){
+        appHandler.get(appName, function(error, App){
           if (error) return logger.error(error), callback(error);
-          this_.apps[name] = new App({
-            onReady: function(){
-              // Call the original onReadyFunction
-              if (this_.Apps[name].onReady) this_.Apps[name].onReady.call(this_.apps[name]);
-              if (++appsLoaded === numApps){
-                callback();
-              }
+          this_.Apps[appName] = App;
+
+          this_.apps[appName].initApps(function(){
+            if (++appsLoaded === numApps){
+              callback();
             }
           });
         });
-      }
+      };
     }
 
   , addApp: function(App){
@@ -125,6 +136,13 @@ define(function(require){
       this.Apps[app.name] = app;
       return this;
     }
+
+    /* complete later
+  , getApp: function(appName, callback){
+      if ()
+
+      if (this.appInstantiated(appName)) return callback(this.apps[appName]), this;
+    }*/
 
   , openApp: function(appName, callback){
       if (!this.appExists(appName))
@@ -168,14 +186,14 @@ define(function(require){
     }
 
   , appExists: function(appName){
-      return !!this.apps[appName];
-    }
-
-  , appInstantiated: function(appName){
       return !!this.Apps[appName];
     }
 
-  , instantiateApp: function(appName, callback){
+  , appInstantiated: function(appName){
+      return !!this.apps[appName];
+    }
+
+  , instantiateApp: function(appName){
       if (!this.appExists(appName)){
         logger.warn("[App.instantiateApp] - App {app} does not exist", { app: appName });
         return this;
@@ -193,8 +211,6 @@ define(function(require){
         baseUrl:  (this.baseUrl || "") + App.baseUrl
         // Attach the app to the defined element
       , $el:      App.$el
-        // Whenever the app has finished loading resources
-      , appReady: callback
       });
 
       return this;
@@ -208,7 +224,7 @@ define(function(require){
       return this;
     }
 
-  , addPage: function(page){
+  /*, addPage: function(page){
       if (this.pageInstantiated(page)) this.destroyPage(page);
       this.pages[page.name] = page;
       return this;
@@ -232,7 +248,7 @@ define(function(require){
 
       this.current.open();
       return this;
-    }
+    }*/
 
   , closeCurrent: function(){
       if (!this.current) return logger.warn("[App.closeCurrent] - There is no page open"), this;

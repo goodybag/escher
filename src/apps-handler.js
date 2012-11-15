@@ -23,6 +23,18 @@ define(function(require){
         return this;
       }
 
+    , lookup: function(name){
+        return this.apps[name];
+      }
+
+    , update: function(name, updated){
+        var app = this.apps[name];
+        for (var key in updated){
+          app[key] = updated[key];
+        }
+        return this;
+      }
+
       /**
        * Retreives an app module - downloads the resources if needed
        * @param  {String}   name     Name of the module
@@ -53,8 +65,6 @@ define(function(require){
     , loaded: function(name){
         return !!this.loaded[name];
       }
-
-    ,
     };
 
     return constructor;
