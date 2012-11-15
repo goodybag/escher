@@ -15,10 +15,11 @@ define(function(require){
     };
 
     constructor.prototype {
-      add: function(name, package){
-        if (!name) throw new Error('Need to specify name when creating an app');
+      add: function(package){
         if (!package) throw new Error('Need to specify package when creating an app');
-        this.apps[name] = package;
+        if (!package.name) throw new Error('Need to specify name when creating an app');
+        if (!package.path) throw new Error('Need to specify path when creating an app');
+        this.apps[package.name] = package;
         return this;
       }
 
@@ -29,9 +30,14 @@ define(function(require){
        * @return {Object}            Instance of the AppHandler object
        */
     , get: function(name, callback){
+        if (!this.apps[name]) return callback(new Error('App does not exist'));
+
         if (!this.loaded(name)){
-          var this_ = this;
-          return require([this.apps[path]], function(module){
+          var this_ = this, app = this.apps[name];
+          return require(app.path, function(module){
+            // save some references for instance object
+            module.prototype._package = app;
+            // Tell handler we've loaded this module
             this_.loaded[name] = module;
             callback(null, module);
           }), this;
@@ -47,6 +53,8 @@ define(function(require){
     , loaded: function(name){
         return !!this.loaded[name];
       }
+
+    ,
     };
 
     return constructor;

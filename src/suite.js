@@ -5,6 +5,28 @@
 
 define(function(require){
   var
+    utils   = require('./utils')
+  , App     = require('./app')
+  ;
+
+  return App.extend({
+    constructor: function(options){
+      App.prototype.constructor.apply(this, arguments);
+
+      // Top level router has already been specified and we're passing in an instance
+      if (options.router) this.router = options.router;
+
+      // Specified Router definition, creating top-level router
+      else if (options.Router) this.router = new utils.Router(options.Router);
+
+      // No router specified - we're just going to create a blank one
+      else this.router = new rad.utils.Router(defaultRouter);
+    }
+  });
+});
+
+define(function(require){
+  var
     utils     = require('utils')
   , logger    = require('logger')
   , App       = require('views/app')

@@ -84,22 +84,33 @@ define(function(require){
     }
 
   , initApps: function(callback){
-      var _this = this, numApps = 0, appsLoaded = 0;
+      var
+        this_       = this
+      , numApps     = 0
+      , appsLoaded  = 0
+      , Apps        = this._packages.apps
+      , appName
+      ;
 
       // Count apps that have not bee instantiated yet
-      for (var name in this.Apps) if (!this.apps[name]) numApps++;
+      for (var name in Apps) if (!this.apps[name]) numApps++;
 
       // Instantiate Apps
-      for (var name in this.Apps){
+      for (var appVarName in ){
+        appName = this._packages.apps[appVarName];
+
         // Don't re-instantiate apps
-        if (!!this.apps[name]) continue;
+        if (this.apps[name]) continue;
+
+        // Don't load apps that want to be deferred
+        if (appName.indexOf('defer!')) continue;
 
         appHandler.get(name, function(error, app){
           if (error) return logger.error(error), callback(error);
-          _this.apps[name] = new app.View({
+          this_.apps[name] = new App({
             onReady: function(){
               // Call the original onReadyFunction
-              if (_this.Apps[name].onReady) _this.Apps[name].onReady.call(_this.apps[name]);
+              if (this_.Apps[name].onReady) this_.Apps[name].onReady.call(this_.apps[name]);
               if (++appsLoaded === numApps){
                 callback();
               }
