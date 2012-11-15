@@ -8,9 +8,6 @@ define(function(require){
     utils   = require('./utils')
   , apps    = require('./apps-handler')
   , App     = require('./app')
-
-  , middleware = []
-  , baseUrl = ''
   ;
 
   return App.extend({
@@ -39,7 +36,7 @@ define(function(require){
             // Call to routers app.openApp with the appName and the last argument to route fn
             // Last argument will be the 'next' function when using middleware
             currentApp.openApp(appName, function(){
-              var callback = Array.prototype.slice.call(arguments, arguments.length - 1);
+              var next = Array.prototype.slice.call(arguments, arguments.length - 1);
 
               /**
                * We shoudl use currentApp.getApp, but since we know it's already ready from
@@ -47,14 +44,18 @@ define(function(require){
                */
 
               currentApp = currentApp.apps[appName];
+              next();
 
               // currentApp.getApp(appName, function(app){
               //   currentApp = app;
-              //   callback();
+              //   next();
               // });
             });
           };
         }
+
+      , middleware = []
+      , baseUrl = ''
 
       , evaluateRouters = function(parentApp){
           var childAppName, childApp, router, route, Router;
