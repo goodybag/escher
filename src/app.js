@@ -31,7 +31,7 @@ define(function(require){
   /**
    * Module dependencies to load
    */
-  , dependencies: {}
+  , /*dependencies: {}
 
   , loadDependencies: function(callback){
       var
@@ -81,6 +81,11 @@ define(function(require){
           this.initApps(done);
         }
       }, callback);
+    }*/
+
+  , constructor: function(options){
+      this.parent = options.parent;
+      utils.View.prototype.constructor.apply(this, arguments);
     }
 
   , initApps: function(callback){
@@ -98,7 +103,7 @@ define(function(require){
        * And just loop through that in the instantiate loop
        */
 
-      // Count apps that have not bee instantiated yet
+      // Count apps that have not been instantiated yet
       for (var name in Apps){
         // Don't load apps that want to be deferred
         if (appName.indexOf('defer!')) continue;
@@ -150,28 +155,25 @@ define(function(require){
 
       callback = callback || utils.noop;
 
-      var app, App = this.Apps[appName];
+      var App = this.Apps[appName];
+
+      if (this.appInstantiated(appName)) return callback(this.apps[appName]);
 
       // Instantiate, render, and add to the dom if we haven't already
-      if (!this.appInstantiated(appName)){
-        var _this = this, options = {};
+      var this_ = this, options = {};
+      this.instantiateApp(appName, function(app){
+        app.render();
+        callback(app);
+      });
 
-        this.instantiateApp(appName, function(){
-          app = _this.apps[appName];
-          app.render();
-          goodToGo();
-        });
-      }else{
-        goodToGo();
-      }
-
+      // Old stuff when we had the page abstraction built in
       // Once the app has been instantiated, pages loaded, rendered, and appended
-      var goodToGo = function(){
-        // Check to see if the app has a page open - open the initial if not
-        if (!_this.current.current) _this.current.openPage(_this.current.initial);
-        _this.current.open();
-        callback();
-      };
+      // var goodToGo = function(){
+      //   // Check to see if the app has a page open - open the initial if not
+      //   if (!this_.current.current) this_.current.openPage(this_.current.initial);
+      //   this_.current.open();
+      //   callback();
+      // };
 
       return this;
     }
@@ -186,6 +188,7 @@ define(function(require){
     }
 
   , appExists: function(appName){
+      return true; // Temp until we fix this shit
       return !!this.Apps[appName];
     }
 
@@ -193,7 +196,7 @@ define(function(require){
       return !!this.apps[appName];
     }
 
-  , instantiateApp: function(appName){
+  , instantiateApp: function(appName, callback){
       if (!this.appExists(appName)){
         logger.warn("[App.instantiateApp] - App {app} does not exist", { app: appName });
         return this;
@@ -204,14 +207,17 @@ define(function(require){
         return this;
       }
 
-      var App = this.Apps[appName];
-
-      this.apps[appName] = new App.constructor({
-        // Convenience in case the app needs to know
-        baseUrl:  (this.baseUrl || "") + App.baseUrl
-        // Attach the app to the defined element
-      , $el:      App.$el
+      apps.get(appName, function(App){
+        this.apps[appName] = new App.constructor({
+          // Convenience in case the app needs to know
+          baseUrl:  (this.baseUrl || "") + App.baseUrl
+          // Attach the app to the defined element
+        , $el:      App.$el
+          // For application traversal
+        , parent: this
+        });
       });
+
 
       return this;
     }
