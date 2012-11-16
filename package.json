@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "A front-end web application architecture framework built on top of Backbone",
   "main": "src/radagast.js",
+  "dependencies": {
+    "backbone": null
+  },
   "directories": {
     "example": "examples"
   },
@@ -19,7 +22,10 @@
   ],
   "author": "John Fawcett",
   "license": "BSD",
-  "dependencies": {
-    "backbone": null
+  "jam": {
+    "dependencies": {
+      "backbone": null
+    },
+    "main": "src/radagast.js"
   }
 }

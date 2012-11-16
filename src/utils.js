@@ -2,18 +2,17 @@ define(function(require){
    var
     // 3rd Party Dependencies
     $         = require('jquery')
-  , _         = require('lodash')
+  , _         = require('underscore')
   , Backbone  = require('backbone')
-  , amanda    = require('amanda')
-  , async     = require('async')
+  // , amanda    = require('amanda')
+  // , async     = require('async')
 
     // App Dependencies
   , config    = require('config')
-  , pubsub    = require('PubSubJS')
+  // , pubsub    = require('PubSubJS')
 
     // Module Variables
-  , validator = amanda('json')
-  , cachedImg = {}
+  // , validator = amanda('json')
   , utils     = {}
   ;
 
@@ -33,9 +32,9 @@ define(function(require){
   utils.History    = Backbone.History;
 
   utils = _.extend(utils, _);
-  utils = _.extend(utils, async);
+  // utils = _.extend(utils, async);
 
-  utils.pubsub = pubsub;
+  // utils.pubsub = pubsub;
 
   return utils;
 });

@@ -1,7 +1,7 @@
 define(function(require){
   var
-    utils   = require('utils')
-  , errors  = require('errors')
+    utils   = require('./utils')
+  , errors  = require('./errors')
   ;
 
   /**
@@ -14,7 +14,7 @@ define(function(require){
       return this;
     };
 
-    constructor.prototype {
+    constructor.prototype = {
       add: function(package){
         if (!package) throw new Error('Need to specify package when creating an app');
         if (!package.name) throw new Error('Need to specify name when creating an app');
