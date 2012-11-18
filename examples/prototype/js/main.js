@@ -2,9 +2,11 @@
 * Prototype - Document Controller
 */
 
-define(['radagast', 'backbone'], function(Radagast, Backbone) {
+define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, SessionService) {
 	var _ = Radagast.Util._;
 
+	// Navigation Routes
+	// =================
 	var DocumentRouter = Backbone.Router.extend({
 		routes:{
 			':layout'           :'standardRoute',
@@ -14,11 +16,8 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 	});
 
 	var PrototypeDocument = Radagast.Document.extend({
-		userSession: {
-			username:null,
-			sessid:null
-		},
-
+		// Layouts
+		// =======
 		// :NOTE: how layouts work
 		//   when we change layouts, onBeforeLayout and onAfterLayout will be fired
 		//   the body's class will also change to 'layout-<layoutname>'
@@ -47,16 +46,15 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			}
 		},
 
+		// Server Routes
+		// =============
 		// :NOTE: how the document server works
 		//   the document is registered to 'rad://document.core' (or something like it)
 		//   the TLD (.core) should be distinct from application TLDs (.ui or .app, whatever we settle on) to avoid collisions
 		//   applications then make requests to 'rad://document.core' to interact with the top-level
 		// :NOTE: the content-type filter should default to json, to save us from specifying it most of the time
 		serverRoutes:{
-			'PUT   /url' :'handleNavigateRequest',
-			'PUT   /user':'handleUserAuthRequest',
-			'POST  /user':'handleUserSignupRequest',
-			'RESET /user':'handleUserResetRequest'
+			'PUT   /url' :'handleNavigateRequest'
 		},
 
 		initialize:function() {
@@ -67,6 +65,12 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			this.router = new DocumentRouter();
 			_.bindEvents(this, this.router); // => param2.on('all', _.bind(param1.trigger, param1)); // rebroadcasts all events of the given emitter
 			Backbone.history.start({ pushState:true });
+
+			// initialize session service
+			this.sessionService = new SessionService();
+			this.registerDomain('sessions.core', this.sessionService);
+			this.sessionService.on('authenticated', this.onUserAuthenticated, this);
+			this.sessionService.on('deauthenticated', this.onUserDeauthenticated, this);
 
 			// load the login layout
 			this.setLayout('login');
@@ -93,59 +97,31 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			}
 		},
 
+		onUserAuthenticated:function() {
+			this.setLayout('standard');
+		},
+
+		onUserDeauthenticated:function() {
+			this.setLayout('login');
+		},
+
 		// PUT /url
 		handleNavigateRequest:function(request, match) {
 			// :TODO: should this be standardized in Radagast.Document?
 
 			// validate
 			if (!request.body.url) {
-				return _.http.response(400, 'request body must include "url"');
+				return _.http.response(400, 'Request body must include "url"');
 			}
 
 			// an application has requested top-level navigation
 			if (this.layout !== 'login' && _.contains(['navigation', 'main'], request.authorization.appid)) {
 				this.router.navigate(request.body.url, { trigger:true }); // do it to it
-				return _.http.response(200, 'ok');
+				return _.http.response(200, 'OK');
 			} else {
 				// only allow the navigation or the main app to do top-level nav
-				return _.http.response(403, 'not allowed');
+				return _.http.response(403, 'Not allowed');
 			}
-		},
-
-		// PUT /user
-		handleUserAuthRequest:function(request, match) {
-			// validate request
-			var errors = {};
-			if (!request.body.username) { errors.username = 'Required.'; }
-			if (!request.body.password) { errors.password = 'Required'; }
-			if (!_.isEmpty(errors)) {
-				return _.http.response(400, 'Invalid username or password', { body:{ errors:errors }, 'content-type':'application/json' });
-			}
-
-			// request a new session from our remote host
-			var p = _.promise();
-			var session_request = _.http.request.postJSON({ uri:'https://foobar.com/sessions', body:request.body });
-			session_request.then(function(res) {
-				if (_.http.response.isOK(res)) {
-					// user has successfully logged in
-					this.setLayout('standard');
-					this.userSession.username = request.body.username;
-					this.userSession.sessid = res.body.sessid;
-				}
-				// pass back to the requesting app the code (but no session data)
-				p.fulfill({ code:res.code, reason:res.reason });
-			});
-			return p;
-		},
-
-		// POST /user
-		handleUserSignupRequest:function(request, match) {
-			return _.http.response(500, 'not yet implemented');
-		},
-
-		// RESET /user
-		handleUserResetRequest:function(request, match) {
-			return _.http.response(500, 'not yet implemented');
 		}
 	});
 
