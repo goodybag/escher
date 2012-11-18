@@ -14,6 +14,11 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 	});
 
 	var PrototypeDocument = Radagast.Document.extend({
+		userSession: {
+			username:null,
+			sessid:null
+		},
+
 		// :NOTE: how layouts work
 		//   when we change layouts, onBeforeLayout and onAfterLayout will be fired
 		//   the body's class will also change to 'layout-<layoutname>'
@@ -46,8 +51,12 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 		//   the document is registered to 'rad://document.core' (or something like it)
 		//   the TLD (.core) should be distinct from application TLDs (.ui or .app, whatever we settle on) to avoid collisions
 		//   applications then make requests to 'rad://document.core' to interact with the top-level
+		// :NOTE: the content-type filter should default to json, to save us from specifying it most of the time
 		serverRoutes:{
-			'PUT /url':{ handler:'requestNavigate', 'content-type':'application/json' }
+			'PUT   /url' :'handleNavigateRequest',
+			'PUT   /user':'handleUserAuthRequest',
+			'POST  /user':'handleUserSignupRequest',
+			'RESET /user':'handleUserResetRequest'
 		},
 
 		initialize:function() {
@@ -85,7 +94,7 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 		},
 
 		// PUT /url
-		requestNavigate:function(request, match) {
+		handleNavigateRequest:function(request, match) {
 			// :TODO: should this be standardized in Radagast.Document?
 
 			// validate
@@ -94,13 +103,49 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			}
 
 			// an application has requested top-level navigation
-			if (_.contains(['navigation', 'main'], request.authorization.appid)) {
+			if (this.layout !== 'login' && _.contains(['navigation', 'main'], request.authorization.appid)) {
 				this.router.navigate(request.body.url, { trigger:true }); // do it to it
 				return _.http.response(200, 'ok');
 			} else {
 				// only allow the navigation or the main app to do top-level nav
 				return _.http.response(403, 'not allowed');
 			}
+		},
+
+		// PUT /user
+		handleUserAuthRequest:function(request, match) {
+			// validate request
+			var errors = {};
+			if (!request.body.username) { errors.username = 'Required.'; }
+			if (!request.body.password) { errors.password = 'Required'; }
+			if (!_.isEmpty(errors)) {
+				return _.http.response(400, 'Invalid username or password', { body:{ errors:errors }, 'content-type':'application/json' });
+			}
+
+			// request a new session from our remote host
+			var p = _.promise();
+			var session_request = _.http.request.postJSON({ uri:'https://foobar.com/sessions', body:request.body });
+			session_request.then(function(res) {
+				if (_.http.response.isOK(res)) {
+					// user has successfully logged in
+					this.setLayout('standard');
+					this.userSession.username = request.body.username;
+					this.userSession.sessid = res.body.sessid;
+				}
+				// pass back to the requesting app the code (but no session data)
+				p.fulfill({ code:res.code, reason:res.reason });
+			});
+			return p;
+		},
+
+		// POST /user
+		handleUserSignupRequest:function(request, match) {
+			return _.http.response(500, 'not yet implemented');
+		},
+
+		// RESET /user
+		handleUserResetRequest:function(request, match) {
+			return _.http.response(500, 'not yet implemented');
 		}
 	});
 

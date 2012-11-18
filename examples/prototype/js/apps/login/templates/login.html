@@ -1,0 +1,10 @@
+<% if (app.noticeMessage) { %>
+	<div class="notice"><%- app.noticeMessage %></div>
+<% } %>
+<form method="put" action="rad://document.core/user">
+	<input type="text" name="username" /><br/>
+	<input type="password" name="password" /><br/>
+	<input type="submit" value="login" />
+</form>
+<a class="signup" href="javascript:void(0)" title="Sign up for a new account">Sign up</a>
+<a class="reset" href="javascript:void(0)" title="Forgot your password? Send a reset email">Forgot password</a>
