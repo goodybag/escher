@@ -23,5 +23,5 @@ define(function(require){
     ]
 
   , prerequisites: []
-  });
+  };
 });

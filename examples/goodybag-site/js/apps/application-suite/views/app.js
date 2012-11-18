@@ -11,11 +11,24 @@ define(function(require){
     template: template
 
   , initialize: function(options){
-      this.current = options.current || 'landing-site';
+      // this.setRegions({
+      //   '.apps-container': ['landing-site', 'consumer-panel'];
+      // , '.nav': 'suite-navigation'
+      // });
+    }
 
+  , open: function(app){
+      // this.region('.apps-container').open(app);
+
+      if (this.current) this.close(this.current);
+      if ()
     }
 
   , render: function(){
+      // if (this.current){
+      //   this.region('.apps-container').open(this.current);
+      // }
+
       this.$el.html(this.template());
     }
 
