@@ -13,19 +13,6 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 		}
 	});
 
-	var DocumentServer = Radagast.DocumentServer.extend({
-		// :NOTE: how this server is used
-		//   whatever server is set as the Radagast.Document server attribute is mapped to 'rad://document.core' (or something like it)
-		//   the TLD (.core) should be distinct from application TLDs (.ui or .app, whatever we settle on) to avoid collisions
-		//   applications then make requests to 'rad://document.core' to interact with the top-level
-		// :NOTE: about DocumentServer
-		//   Radagast.DocumentServer extends from Radagast.Server
-		//   it provides standard routes for the Document to implement, as well as standard fallback handlers (usually noops)
-		routes:{
-			// put any custom routes here (inherits standard routes defined in DocumentServer)
-		}
-	});
-
 	var PrototypeDocument = Radagast.Document.extend({
 		// :NOTE: how layouts work
 		//   when we change layouts, onBeforeLayout and onAfterLayout will be fired
@@ -44,15 +31,23 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 		layouts:{
 			login:{
 				apps:['main', 'navigation'],
-				defaultMain:'js/apps/login/manifest.js'
+				defaultMain:'js/apps/login'
 			},
 			standard:{
 				apps:['main', 'navigation', 'widget1', 'widget2', 'widget3'],
-				defaultMain:'js/apps/dashboard/manifest.js',
-				defaultWidget1:'js/apps/calendar/manifest.js',
-				defaultWidget2:'js/apps/todo/manifest.js',
-				defaultWidget3:'js/apps/time/manifest.js'
+				defaultMain:'js/apps/dashboard',
+				defaultWidget1:'js/apps/calendar',
+				defaultWidget2:'js/apps/todo',
+				defaultWidget3:'js/apps/clock'
 			}
+		},
+
+		// :NOTE: how the document server works
+		//   the document is registered to 'rad://document.core' (or something like it)
+		//   the TLD (.core) should be distinct from application TLDs (.ui or .app, whatever we settle on) to avoid collisions
+		//   applications then make requests to 'rad://document.core' to interact with the top-level
+		serverRoutes:{
+			'PUT /url':{ handler:'requestNavigate', 'content-type':'application/json' }
 		},
 
 		initialize:function() {
@@ -61,12 +56,8 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 
 			// take over the browser address bar
 			this.router = new DocumentRouter();
-			_.bindEvents(this, this.router); // => this.router.on('all', _.bind(this.trigger, this)); // rebroadcasts all events of the given emitter
+			_.bindEvents(this, this.router); // => param2.on('all', _.bind(param1.trigger, param1)); // rebroadcasts all events of the given emitter
 			Backbone.history.start({ pushState:true });
-
-			// start listening for HTTP requests from the applications
-			this.server = new DocumentServer();
-			_.bindEvents(this, this.server);
 
 			// load the login layout
 			this.setLayout('login');
@@ -85,7 +76,7 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 
 		onAfterLayout:function(layout) {
 			// post-layout event; load any apps that might not be active
-			this.setApp('navigation', 'js/apps/navigation/manifest.js');
+			this.setApp('navigation', 'js/apps/navigation');
 			if (layout == 'standard') {
 				this.setApp('widget1', this.layout.defaultWidget1);
 				this.setApp('widget2', this.layout.defaultWidget2);
@@ -93,21 +84,22 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			}
 		},
 
+		// PUT /url
 		requestNavigate:function(request, match) {
 			// :TODO: should this be standardized in Radagast.Document?
-			
-			// validate request
-			if (!_.http.validate(request, { body:['url'] })) {
-				return _.http.response([400, 'body must specify "url"']);
+
+			// validate
+			if (!request.body.url) {
+				return _.http.response(400, 'request body must include "url"');
 			}
 
 			// an application has requested top-level navigation
 			if (_.contains(['navigation', 'main'], request.authorization.appid)) {
 				this.router.navigate(request.body.url, { trigger:true }); // do it to it
-				return _.http.response([200, 'ok']);
+				return _.http.response(200, 'ok');
 			} else {
 				// only allow the navigation or the main app to do top-level nav
-				return _.http.response([403, 'not allowed']);
+				return _.http.response(403, 'not allowed');
 			}
 		}
 	});
