@@ -37,7 +37,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 				apps:['main', 'navigation'],
 				defaultMain:'js/apps/login'
 			},
-			standard:{
+			main:{
 				apps:['main', 'navigation', 'widget1', 'widget2', 'widget3'],
 				defaultMain:'js/apps/dashboard',
 				defaultWidget1:'js/apps/calendar',
@@ -90,7 +90,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 		onAfterLayout:function(layout) {
 			// post-layout event; load any apps that might not be active
 			this.setApp('navigation', 'js/apps/navigation');
-			if (layout == 'standard') {
+			if (layout == 'main') {
 				this.setApp('widget1', this.layout.defaultWidget1);
 				this.setApp('widget2', this.layout.defaultWidget2);
 				this.setApp('widget3', this.layout.defaultWidget3);
@@ -98,7 +98,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 		},
 
 		onUserAuthenticated:function() {
-			this.setLayout('standard');
+			this.setLayout('main');
 		},
 
 		onUserDeauthenticated:function() {
