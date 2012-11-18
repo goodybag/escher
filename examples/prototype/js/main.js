@@ -159,13 +159,12 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 
 			// request a new session from our remote host
 			var session_request = _.http.request.pipe(request, { uri:'https://foobar.com/sessions' });
-			session_request.then(function(res) {
-				if (_.http.response.isOK(res)) {
-					// user has successfully logged in
-					this.setLayout('standard');
-					this.userSession.username = request.body.username;
-					this.userSession.sessid = res.body.sessid;
-				}
+			_.http.response.onOK(session_request, function(res) {
+				// user has successfully logged in
+				this.setLayout('standard');
+				this.userSession.username = request.body.username;
+				this.userSession.sessid = res.body.sessid;
+
 			});
 			return session_request;
 		},
