@@ -5,6 +5,8 @@
 define(['radagast', 'backbone'], function(Radagast, Backbone) {
 	var _ = Radagast.Util._;
 
+	// Navigation Routes
+	// =================
 	var DocumentRouter = Backbone.Router.extend({
 		routes:{
 			':layout'           :'standardRoute',
@@ -14,11 +16,19 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 	});
 
 	var PrototypeDocument = Radagast.Document.extend({
+		// User Session State
+		// ==================
 		userSession: {
 			username:null,
 			sessid:null
 		},
 
+		isUserAuthorized:function() {
+			return (this.userSession.sessid !== null);
+		},
+
+		// Layouts
+		// =======
 		// :NOTE: how layouts work
 		//   when we change layouts, onBeforeLayout and onAfterLayout will be fired
 		//   the body's class will also change to 'layout-<layoutname>'
@@ -47,6 +57,8 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			}
 		},
 
+		// Server Routes
+		// =============
 		// :NOTE: how the document server works
 		//   the document is registered to 'rad://document.core' (or something like it)
 		//   the TLD (.core) should be distinct from application TLDs (.ui or .app, whatever we settle on) to avoid collisions
@@ -59,6 +71,8 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			'RESET /user':'handleUserResetRequest'
 		},
 
+		// Setup
+		// =====
 		initialize:function() {
 			// convert all link clicks and form submits into request DOM events
 			Radagast.Util.RequestEvents.bind();
@@ -73,6 +87,8 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			this.setApp('main', this.layout.defaultMain);
 		},
 
+		// Navigation Events
+		// =================
 		standardRoute:function(layout, app, view) {
 			// route change; make adjustments to our state
 			// :NOTE: setLayout and setApp will do nothing if given value is current value
@@ -83,6 +99,8 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			}
 		},
 
+		// Layout Events
+		// =============
 		onAfterLayout:function(layout) {
 			// post-layout event; load any apps that might not be active
 			this.setApp('navigation', 'js/apps/navigation');
@@ -93,38 +111,54 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 			}
 		},
 
+		// Request Handlers
+		// ================
 		// PUT /url
 		handleNavigateRequest:function(request, match) {
 			// :TODO: should this be standardized in Radagast.Document?
 
 			// validate
 			if (!request.body.url) {
-				return _.http.response(400, 'request body must include "url"');
+				return _.http.response(400, 'Request body must include "url"');
 			}
 
 			// an application has requested top-level navigation
 			if (this.layout !== 'login' && _.contains(['navigation', 'main'], request.authorization.appid)) {
 				this.router.navigate(request.body.url, { trigger:true }); // do it to it
-				return _.http.response(200, 'ok');
+				return _.http.response(200, 'OK');
 			} else {
 				// only allow the navigation or the main app to do top-level nav
-				return _.http.response(403, 'not allowed');
+				return _.http.response(403, 'Not allowed');
 			}
 		},
 
 		// PUT /user
 		handleUserAuthRequest:function(request, match) {
+			// :TODO: permissions for who can make this request? (just the login app, right?)
+			// :TODO: deauthorization (logout) -- would that just a PUT with a null username?
+
 			// validate request
-			var errors = {};
-			if (!request.body.username) { errors.username = 'Required.'; }
-			if (!request.body.password) { errors.password = 'Required'; }
-			if (!_.isEmpty(errors)) {
+			// :NOTE: since we're just piping this to a remote domain, we could probably not bother validating (it'll validate there)
+			//   the only reason is to lower latency, and to act as an example of clientside validation
+			// :TODO: I'm just making up this '_.validate' function, but we should have something like it, amirite?
+			//   it would produce an "errors" object if there's a problem, with each key containing the message of the first failure
+			//   so, for instance, if the username was 1 character long, and the password was undefined, it would return...
+			//   { username:'Must be at least 3 characters long', password:'Required' }
+			var errors = _.validate(function(assert) {
+				assert(request.body.username, 'username')
+					.isA('string', 'Required')
+					.minLength(3, 'Must be at least 3 characters long')
+					.maxLength(12, 'Must be no more than 12 characters long');
+				assert(request.body.password, 'password')
+					.isA('string', 'Required')
+					.minLength(3, 'Must be at least 3 characters long');
+			});
+			if (errors) {
 				return _.http.response(400, 'Invalid username or password', { body:{ errors:errors }, 'content-type':'application/json' });
 			}
 
 			// request a new session from our remote host
-			var p = _.promise();
-			var session_request = _.http.request.postJSON({ uri:'https://foobar.com/sessions', body:request.body });
+			var session_request = _.http.request.pipe(request, { uri:'https://foobar.com/sessions' });
 			session_request.then(function(res) {
 				if (_.http.response.isOK(res)) {
 					// user has successfully logged in
@@ -132,20 +166,18 @@ define(['radagast', 'backbone'], function(Radagast, Backbone) {
 					this.userSession.username = request.body.username;
 					this.userSession.sessid = res.body.sessid;
 				}
-				// pass back to the requesting app the code (but no session data)
-				p.fulfill({ code:res.code, reason:res.reason });
 			});
-			return p;
+			return session_request;
 		},
 
 		// POST /user
 		handleUserSignupRequest:function(request, match) {
-			return _.http.response(500, 'not yet implemented');
+			return _.http.response(500, 'Not yet implemented');
 		},
 
 		// RESET /user
 		handleUserResetRequest:function(request, match) {
-			return _.http.response(500, 'not yet implemented');
+			return _.http.response(500, 'Not yet implemented');
 		}
 	});
 

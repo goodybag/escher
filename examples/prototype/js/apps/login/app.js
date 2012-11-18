@@ -20,17 +20,7 @@ define([
 		},
 
 		onFormResponse:function(e) {
-			var res = e.detail.response;
-			if (_.http.response.isOK(res)) {
-				this.app.setNotice('Success!');
-				// :NOTE: the document has begun the layout change, so we will be replaced shortly
-			}
-			else if (_.http.response.isRequestError(res)) {
-				this.app.setNotice('Invalid username or password.');
-			}
-			else if (_.http.response.isServerError(res)) {
-				this.app.setNotice('There was an internal server error while processing your request. ('+res.reason+')');
-			}
+			this.app.setNotice(e.detail.response.reason);
 			this.render();
 		},
 
@@ -61,19 +51,8 @@ define([
 		},
 
 		onFormResponse:function(e) {
-			var res = e.detail.response;
-			if (_.http.response.isOK(res)) {
-				this.app.setNotice('Your account has been created. Please check your email for a confirmation link.');
-				this.app.setView('login');
-			}
-			else if (_.http.response.isRequestError(res)) {
-				this.app.setNotice('Unable to create your account: ' + res.reason);
-				this.render();
-			}
-			else if (_.http.response.isServerError(res)) {
-				this.app.setNotice('There was an internal server error while processing your request. ('+res.reason+')');
-				this.render();
-			}
+			this.app.setNotice(e.detail.response.reason);
+			this.render();
 		},
 
 		onClickCancel:function() {
@@ -98,19 +77,8 @@ define([
 		},
 
 		onFormResponse:function(e) {
-			var res = e.detail.response;
-			if (_.http.response.isOK(res)) {
-				this.app.setNotice('An email has been sent with instructions on how to reset your password.');
-				this.app.setView('login');
-			}
-			else if (_.http.response.isRequestError(res)) {
-				this.app.setNotice('Invalid username.');
-				this.render();
-			}
-			else if (_.http.response.isServerError(res)) {
-				this.app.setNotice('There was an internal server error while processing your request. ('+res.reason+')');
-				this.render();
-			}
+			this.app.setNotice(e.detail.response.reason);
+			this.render();
 		},
 
 		onClickCancel:function() {
