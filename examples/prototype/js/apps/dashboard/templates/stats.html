@@ -1,0 +1,8 @@
+<div class="stats">
+	<% _.each(app.statCollection, function(stat) { %>
+		<div>
+			<span class="label"><%- stat.label %></span>
+			<span class="value"><%- stat.value %></span>
+		</div>
+	<% }); %>
+</div>

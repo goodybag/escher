@@ -11,7 +11,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 		routes:{
 			':layout'           :'standardRoute',
 			':layout/:app'      :'standardRoute',
-			':layout/:app/:view':'standardRoute'
+			':layout/:app/*view':'standardRoute'
 		}
 	});
 
@@ -83,7 +83,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 			this.setLayout(layout);
 			this.setApp('main', app || this.layout.defaultMain);
 			if (view) {
-				this.getApp('main').setView(view);
+				_.http.dispatch('put', 'rad://main.app/view', { view:view });
 			}
 		},
 
