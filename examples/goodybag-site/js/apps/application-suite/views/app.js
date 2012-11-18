@@ -17,11 +17,18 @@ define(function(require){
       // });
     }
 
-  , open: function(app){
-      // this.region('.apps-container').open(app);
+  , open: function(appName){
+      // this.region('.apps-container').open(appName);
+
+      this.html(this.template());
 
       if (this.current) this.close(this.current);
-      if ()
+      var this_ = this;
+      this.openApp(appName, function(app){
+        app.render();
+        app.setElement(this_.$el.find('.main-app'));
+        this_.current = appName;
+      });
     }
 
   , render: function(){
