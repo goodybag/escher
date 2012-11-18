@@ -9,14 +9,7 @@ define(['radagast', 'backbone', 'text!templates/navigation.html'], function(Rada
 		template:_.template(navigationTemplate),
 
 		events:{
-			'click .nav'   :'onClickNav',
 			'click .logout':'onClickLogout'
-		},
-
-		onClickNav:function(e) {
-			// ask the document to navigate
-			_.http.dispatch('put', 'rad://document.core/url', { url:e.target.getAttribute('href') });
-			// :NOTE: we might give a message on failure, if we like (could happen if in login view)
 		},
 
 		onClickLogout:function() {
