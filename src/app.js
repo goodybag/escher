@@ -115,13 +115,17 @@ define(function(require){
 
       // Instantiate Apps
       for (var i = Apps.length - 1; i >= 0; i--){
-        appName = Apps[i].name;
+        appName = Apps[i];
 
         // Don't re-instantiate apps
         if (this.apps[name]) continue;
 
         // Don't load apps that want to be deferred
-        if (appName.indexOf('defer!')) continue;
+        if (appName.indexOf('defer!')){
+          // Strip the defer status
+          Apps[i] = appName.substring(appName.lastIndexOf('!') + 1);
+          continue;
+        }
 
         appHandler.get(appName, function(error, App){
           if (error) return logger.error(error), callback(error);
@@ -136,10 +140,38 @@ define(function(require){
       };
     }
 
+  , setRegions: function(regions){
+      for (var region in regions){
+        if (!(region in regions)) continue;
+        this.setRegion(region);
+      }
+      return this;
+    }
+
+  , setRegion: function(selector, application){
+      if (utils.isArray(application)){
+        for ()
+      }else{
+        this._regions[selector] = application;
+      }
+    }
+
+  , wireApplicationToRegion: function(region, application){
+      // Ensure that we're not trying to wire a non-instantiated app
+      if (this.apps[application]){
+        // if the region is blank, then it's just the root element
+        this.apps[application].setElement(region !== '' ? this.$el.find(region) : this.$el);
+      }
+    }
+
   , addApp: function(App){
       if (this.appInstantiated(App)) this.destroyApp(App);
       this.Apps[app.name] = app;
       return this;
+    }
+
+  , getApp: function(appName){
+      return this.apps[appName];
     }
 
     /* complete later
