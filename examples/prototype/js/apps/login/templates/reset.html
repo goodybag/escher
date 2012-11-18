@@ -1,7 +1,7 @@
 <% if (app.noticeMessage) { %>
 	<div class="notice"><%- app.noticeMessage %></div>
 <% } %>
-<form method="reset" action="rad://document.core/user">
+<form method="reset" action="rad://sessions.core/user">
 	<input type="text" name="username" /><br/>
 	<input type="submit" value="reset" />
 </form>
