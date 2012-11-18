@@ -1,0 +1,8 @@
+<% if (app.noticeMessage) { %>
+	<div class="notice"><%- app.noticeMessage %></div>
+<% } %>
+<form method="reset" action="rad://document.core/user">
+	<input type="text" name="username" /><br/>
+	<input type="submit" value="reset" />
+</form>
+<a class="cancel" href="javascript:void(0)" title="Go back to login">Cancel</a>
