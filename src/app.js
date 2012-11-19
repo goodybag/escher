@@ -31,7 +31,7 @@ define(function(require){
   /**
    * Module dependencies to load
    */
-  , /*dependencies: {}
+  /*, dependencies: {}
 
   , loadDependencies: function(callback){
       var
@@ -84,7 +84,8 @@ define(function(require){
     }*/
 
   , constructor: function(options){
-      this.parent = options.parent;
+    console.log("app constructor");
+      if (options && options.parent) this.parent = options.parent;
       utils.View.prototype.constructor.apply(this, arguments);
     }
 
@@ -93,7 +94,7 @@ define(function(require){
         this_       = this
       , numApps     = 0
       , appsLoaded  = 0
-      , Apps        = this._packages.apps
+      , Apps        = this._package.apps
       , appName
       ;
 
@@ -106,7 +107,7 @@ define(function(require){
       // Count apps that have not been instantiated yet
       for (var name in Apps){
         // Don't load apps that want to be deferred
-        if (appName.indexOf('defer!')) continue;
+        if (name.indexOf('defer!')) continue;
         // Don't count apps already instantiated
         if (this.apps[name]) continue;
 
@@ -121,9 +122,9 @@ define(function(require){
         if (this.apps[name]) continue;
 
         // Don't load apps that want to be deferred
-        if (appName.indexOf('defer!')){
+        if (appName.indexOf('defer!') > -1){
           // Strip the defer status
-          Apps[i] = appName.substring(appName.lastIndexOf('!') + 1);
+          appName = Apps[i] = appName.substring(appName.lastIndexOf('!') + 1);
           continue;
         }
 
@@ -150,7 +151,7 @@ define(function(require){
 
   , setRegion: function(selector, application){
       if (utils.isArray(application)){
-        for ()
+        // for ()
       }else{
         this._regions[selector] = application;
       }
@@ -239,12 +240,16 @@ define(function(require){
         return this;
       }
 
+      if (this.Apps[appName]) return callback(this.apps[appName] = new this.Apps[appName]), this;
+
       apps.get(appName, function(App){
-        this.apps[appName] = new App.constructor({
+        this.Apps[appName] = App;
+
+        this.apps[appName] = new App({
           // Convenience in case the app needs to know
           baseUrl:  (this.baseUrl || "") + App.baseUrl
           // Attach the app to the defined element
-        , $el:      App.$el
+        // , $el:      App.$el
           // For application traversal
         , parent: this
         });

@@ -1,6 +1,7 @@
 define(function(require){
   return [
-    require('apps/landing-site/app')
-  // , require('apps/consumer-panel/app')
+    'apps/landing-site/app'
+  , 'apps/application-suite/app'
+  // 'apps/consumer-panel/app'
   ];
 });

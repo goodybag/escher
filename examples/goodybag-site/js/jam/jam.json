@@ -1,4 +1,12 @@
 {
     "jam_version": "0.1.11",
-    "dependencies": {}
+    "dependencies": {
+        "domReady": null,
+        "hbt": null,
+        "radagast": "linked",
+        "underscore": null,
+        "jquery": null,
+        "backbone.subroute": null,
+        "async": null
+    }
 }

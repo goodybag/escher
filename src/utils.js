@@ -3,12 +3,11 @@ define(function(require){
     // 3rd Party Dependencies
     $         = require('jquery')
   , _         = require('underscore')
-  , Backbone  = require('./backbone')
+  , Backbone  = require('backbone')
   // , amanda    = require('amanda')
   // , async     = require('async')
 
     // App Dependencies
-  , config    = require('config')
   // , pubsub    = require('PubSubJS')
 
     // Module Variables

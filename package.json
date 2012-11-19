@@ -4,7 +4,7 @@
   "description": "A front-end web application architecture framework built on top of Backbone",
   "main": "src/radagast.js",
   "dependencies": {
-    "backbone": null
+    "backbone.subroute": null
   },
   "directories": {
     "example": "examples"
@@ -24,7 +24,7 @@
   "license": "BSD",
   "jam": {
     "dependencies": {
-      "backbone": null
+      "backbone.subroute": null
     },
     "main": "src/radagast.js"
   }

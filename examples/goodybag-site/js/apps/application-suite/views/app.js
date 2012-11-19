@@ -4,7 +4,7 @@ define(function(require){
   , utils = rad.utils
   , Suite = rad.Suite
 
-  , template = require('./templates/suite')
+  , template = require('hbt!./../templates/suite')
   ;
 
   return Suite.extend({
@@ -15,6 +15,7 @@ define(function(require){
       //   '.apps-container': ['landing-site', 'consumer-panel'];
       // , '.nav': 'suite-navigation'
       // });
+      console.log("lkajsdf");
     }
 
   , open: function(appName){

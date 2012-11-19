@@ -8,24 +8,34 @@ define(function(require){
     utils   = require('./utils')
   , apps    = require('./apps-handler')
   , App     = require('./app')
+
+  , defaultRouter = {
+      routes: {
+        "": "defaultRoute"
+      }
+    , "defaultRoute": function(){
+        console.log("HOWDY!");
+      }
+    }
   ;
 
   return App.extend({
     constructor: function(options){
+console.log("suite constructor");
       App.prototype.constructor.apply(this, arguments);
 
       // If a top-level router has not been specified yet
       if (!utils.history){
         // Top level router has already been specified and we're passing in an instance
-        if (options.router) this.router = options.router;
+        if (options && options.router) this.router = options.router;
 
         // Specified Router definition, creating top-level router
-        else if (options.Router) this.router = new utils.Router(options.Router);
+        else if (options && options.Router) this.router = new utils.Router(options.Router);
 
         // No router specified - we're just going to create a blank one
-        else this.router = new rad.utils.Router(defaultRouter);
+        else this.router = new utils.Router(defaultRouter);
       }
-
+console.log("suite constructor");
       var
         this_ = this
 
@@ -64,8 +74,8 @@ define(function(require){
           baseUrl += parentApp.baseUrl || '';
           middleware.push(ensureOpen(parentApp.name));
 
-          for (var childAppKey in parentApp){
-            childAppName = parentApp[childAppKey];
+          for (var i = parentApp.apps.length -1; i >= 0; i--){
+            childAppName = parentApp.apps[i];
 
             // Get the actual app name after plugin behavior like defer
             if (childAppName.indexOf('!') > -1)
@@ -78,7 +88,7 @@ define(function(require){
 
               // Loop through all routes and mixin parent middleware
               for (var routePath in router.routes){
-                if (!routes.hasOwnProperty(routePath)) continue;
+                if (!router.routes.hasOwnProperty(routePath)) continue;
 
                 route = router[router.routes[routePath]];
 
@@ -99,13 +109,14 @@ define(function(require){
             // Does the child have children?
             if (childApp.hasOwnProperty('apps')){
               // Run through the process for all apps
-              evaluateRouter(childApp);
+              evaluateRouters(childApp);
             }
           }
         }
       ;
-
+console.log("evaluating routers");
       evaluateRouters(this._package);
     }
+  , test: "laksjdklfaf"
   });
 });

@@ -4,7 +4,7 @@
 
 define(function(require){
   return {
-    name: 'application-suite'
+    name: 'landing-site'
 
   , path: './views/app'
 

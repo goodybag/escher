@@ -4,7 +4,7 @@
 
 define(function(require){
   var
-    utils   = require('utils')
+    utils   = require('./utils')
   , logger  = {}
   , isInter = /{([^{}]*)}/
 
