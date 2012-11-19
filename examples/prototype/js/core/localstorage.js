@@ -3,7 +3,7 @@
 *   based on https://github.com/jeromegn/Backbone.localStorage
 */
 
-define(['radagast', 'backbone'], function(Radagast, Backbone) {
+define(['radagast'], function(Radagast) {
 	var _ = Radagast.Util._;
 
 	return Radagast.Application.extend({
