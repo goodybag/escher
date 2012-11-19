@@ -8,81 +8,6 @@ define(function(require){
   return utils.View.extend({
     className: 'app'
 
-  /**
-   * Application definitions
-   */
-  , Apps: {}
-
-  /**
-   * Instantiated applications
-   */
-  , apps: {}
-
-  /**
-   * Page definitions
-   */
-  , Pages: {}
-
-  /**
-   * Instantiated pages
-   */
-  , pages: {}
-
-  /**
-   * Module dependencies to load
-   */
-  /*, dependencies: {}
-
-  , loadDependencies: function(callback){
-      var
-        this_     = this
-      , dependex  = {}
-      , depends   = []
-
-      , flattenDepends = function(dependencies){
-          var dependency;
-          for (var key in dependencies){
-            dependency = dependencies[key];
-            if (typeof dependency === "string"){
-              dependex[key] = depends.push(dependency) - 1;
-            }else if (typeof dependency === "object"){
-              flattenDepends(dependency);
-            }
-          }
-        }
-      ;
-
-      // Require templates and child views
-      utils.parallel({
-        depends: function(done){
-          require(depends, function(){
-            var
-              args = Array.prototype.slice.call(arguments, 0)
-
-            , applyDepends = function(context, dependencies){
-                var dependency;
-                for (var key in dependencies){
-                  dependency = dependencies[key];
-                  if (typeof dependency === "string"){
-                    context[key] = args[dependex[key]];
-                  }else if (typeof dependency === "object"){
-                    context[key] = {};
-                    applyDepends(context[key], dependency);
-                  }
-                }
-              }
-            ;
-
-            applyDepends(_this, _this.dependencies);
-            done();
-          });
-        }
-      , apps: function(done){
-          this.initApps(done);
-        }
-      }, callback);
-    }*/
-
   , constructor: function(options){
     console.log("app constructor");
       if (options && options.parent) this.parent = options.parent;
@@ -267,32 +192,6 @@ define(function(require){
       return this;
     }
 
-  /*, addPage: function(page){
-      if (this.pageInstantiated(page)) this.destroyPage(page);
-      this.pages[page.name] = page;
-      return this;
-    }
-
-  , openPage: function(pageName){
-      if (!this.pageExists(pageName))
-        return logger.warn("[App.openPage] - Page {page} does not exist", { page: pageName }), this;
-
-      // Close the current page
-      if (this.current) this.closeCurrent();
-
-      // Instantiate, render, and add to the dom if we haven't already
-      if (!this.pageInstantiated(pageName)){
-        logger.info("[App.openPage] - Instantiating Page {page}", { page: pageName });
-        this.instantiatePage(pageName);
-        this.current = this.pages[pageName];
-        this.current.render();
-        this.$el.find('.pages').append(this.current.$el);
-      } else this.current = this.pages[pageName];
-
-      this.current.open();
-      return this;
-    }*/
-
   , closeCurrent: function(){
       if (!this.current) return logger.warn("[App.closeCurrent] - There is no page open"), this;
       this.current.close();
@@ -306,35 +205,6 @@ define(function(require){
         return logger.warn("[App.closePage] - Page {page} is not instantiated", { page: pageName }), this;
       this.pages[pageName].close();
       if (this.current.name === pageName) this.current = null;
-      return this;
-    }
-
-  , pageExists: function(pageName){
-      return !!this.Pages[pageName];
-    }
-
-  , pageInstantiated: function(pageName){
-      return !!this.pages[pageName];
-    }
-
-  , instantiatePage: function(pageName){
-      if (!this.pageExists(pageName)){
-        logger.warn("[App.instantiatePage] - Page {page} does not exist");
-        return this;
-      }
-      if (this.pageInstantiated(pageName)) this.destroyPage(pageName);
-      this.pages[pageName] = new this.Pages[pageName]({
-
-      });
-
-      return this;
-    }
-
-  , destroyPage: function(pageName){
-      if (!this.pageExists(pageName))
-        return logger.warn("[App.destroyPage] - Page {page} does not exist", { page: pageName }), this;
-      this.pages[pageName].destroy();
-      this.pages[pageName] = null;
       return this;
     }
 
