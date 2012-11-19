@@ -2,7 +2,7 @@
 * Prototype - Document Controller
 */
 
-define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, SessionService) {
+define(['radagast', 'backbone', 'core/session', 'core/localstorage'], function(Radagast, Backbone, SessionService, LocalStorageService) {
 	var _ = Radagast.Util._;
 
 	// Navigation Routes
@@ -11,7 +11,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 		routes:{
 			':layout'           :'standardRoute',
 			':layout/:app'      :'standardRoute',
-			':layout/:app/:view':'standardRoute'
+			':layout/:app/*view':'standardRoute'
 		}
 	});
 
@@ -37,7 +37,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 				apps:['main', 'navigation'],
 				defaultMain:'js/apps/login'
 			},
-			standard:{
+			main:{
 				apps:['main', 'navigation', 'widget1', 'widget2', 'widget3'],
 				defaultMain:'js/apps/dashboard',
 				defaultWidget1:'js/apps/calendar',
@@ -72,6 +72,10 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 			this.sessionService.on('authenticated', this.onUserAuthenticated, this);
 			this.sessionService.on('deauthenticated', this.onUserDeauthenticated, this);
 
+			// initialize local storage service
+			this.localStorageService = new LocalStorageService();
+			this.registerDomain('localstorage.core', this.localStorageService);
+
 			// load the login layout
 			this.setLayout('login');
 			this.setApp('main', this.layout.defaultMain);
@@ -83,14 +87,14 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 			this.setLayout(layout);
 			this.setApp('main', app || this.layout.defaultMain);
 			if (view) {
-				this.getApp('main').setView(view);
+				_.http.dispatch('put', 'rad://main.app/view', { view:view });
 			}
 		},
 
 		onAfterLayout:function(layout) {
 			// post-layout event; load any apps that might not be active
 			this.setApp('navigation', 'js/apps/navigation');
-			if (layout == 'standard') {
+			if (layout == 'main') {
 				this.setApp('widget1', this.layout.defaultWidget1);
 				this.setApp('widget2', this.layout.defaultWidget2);
 				this.setApp('widget3', this.layout.defaultWidget3);
@@ -98,7 +102,7 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 		},
 
 		onUserAuthenticated:function() {
-			this.setLayout('standard');
+			this.setLayout('main');
 		},
 
 		onUserDeauthenticated:function() {
@@ -124,6 +128,28 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 			}
 		}
 	});
+
+	// Override to use Radagast http router
+	Backbone.sync = function(method, model, options) {
+		var headers = options || (options = {});
+		
+		// get url
+		var url = headers.url;
+		if (!url) {
+			url = model.url; // :TODO: check if url is a function and call if so
+		}
+		delete headers.url;
+
+		// get body
+		var body = headers.data;
+		if (!body && model && (method == 'create' || method == 'update')) {
+			body = JSON.stringify(model.toJSON());
+		}
+		delete headers.data;
+
+		// dispatch
+		return _.http.dispatch(method, url, body, 'application/json', headers);
+	};
 
 	return PrototypeDocument;
 });
