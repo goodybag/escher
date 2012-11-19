@@ -2,7 +2,7 @@
 * Prototype - Document Controller
 */
 
-define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, SessionService) {
+define(['radagast', 'backbone', 'core/session', 'core/localstorage'], function(Radagast, Backbone, SessionService, LocalStorageService) {
 	var _ = Radagast.Util._;
 
 	// Navigation Routes
@@ -72,6 +72,10 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 			this.sessionService.on('authenticated', this.onUserAuthenticated, this);
 			this.sessionService.on('deauthenticated', this.onUserDeauthenticated, this);
 
+			// initialize local storage service
+			this.localStorageService = new LocalStorageService();
+			this.registerDomain('localstorage.core', this.localStorageService);
+
 			// load the login layout
 			this.setLayout('login');
 			this.setApp('main', this.layout.defaultMain);
@@ -124,6 +128,28 @@ define(['radagast', 'backbone', 'core/session'], function(Radagast, Backbone, Se
 			}
 		}
 	});
+
+	// Override to use Radagast http router
+	Backbone.sync = function(method, model, options) {
+		var headers = options || (options = {});
+		
+		// get url
+		var url = headers.url;
+		if (!url) {
+			url = model.url; // :TODO: check if url is a function and call if so
+		}
+		delete headers.url;
+
+		// get body
+		var body = headers.data;
+		if (!body && model && (method == 'create' || method == 'update')) {
+			body = JSON.stringify(model.toJSON());
+		}
+		delete headers.data;
+
+		// dispatch
+		return _.http.dispatch(method, url, body, 'application/json', headers);
+	};
 
 	return PrototypeDocument;
 });

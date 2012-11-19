@@ -18,7 +18,7 @@ define(['radagast', 'backbone', 'collection/statistic', 'views/stats'], function
 			// :NOTE: this request could probably be standardized -- this.getSession or something
 			var session_req = _.http.dispatch('get', 'rad://sessions.core/user');
 			_.http.response.onOK(session_req, function(res, data) {
-				this.statCollection.url = 'https://foobar.com/users/' + data.username + '/stats';
+				this.statCollection.url = 'rad://localstorage.core/' + data.username + '-stats';
 				this.statCollection.fetch();
 			});
 		}
