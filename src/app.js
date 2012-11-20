@@ -9,61 +9,45 @@ define(function(require){
     className: 'app'
 
   , constructor: function(options){
-    console.log("app constructor");
       if (options && options.parent) this.parent = options.parent;
+      this.apps = {};
+      this.Apps = {};
+      console.log("app constructor");
       utils.View.prototype.constructor.apply(this, arguments);
     }
 
   , initApps: function(callback){
       var
-        this_       = this
-      , numApps     = 0
-      , appsLoaded  = 0
-      , Apps        = this._package.apps
+        this_         = this
+      , deferredApps  = 0
+      , appsLoaded    = 0
+      , Apps          = this._package.apps
       , appName
       ;
-
-      /**
-       * Could probably re-factor these two loops
-       * Create a new object based on the counting loop
-       * And just loop through that in the instantiate loop
-       */
-
-      // Count apps that have not been instantiated yet
-      for (var name in Apps){
-        // Don't load apps that want to be deferred
-        if (name.indexOf('defer!')) continue;
-        // Don't count apps already instantiated
-        if (this.apps[name]) continue;
-
-        numApps++;
-      }
-
       // Instantiate Apps
       for (var i = Apps.length - 1; i >= 0; i--){
         appName = Apps[i];
 
         // Don't re-instantiate apps
-        if (this.apps[name]) continue;
+        if (this.apps[appName]) continue;
 
         // Don't load apps that want to be deferred
         if (appName.indexOf('defer!') > -1){
           // Strip the defer status
           appName = Apps[i] = appName.substring(appName.lastIndexOf('!') + 1);
+          deferredApps++;
           continue;
         }
 
-        appHandler.get(appName, function(error, App){
-          if (error) return logger.error(error), callback(error);
-          this_.Apps[appName] = App;
-
-          this_.apps[appName].initApps(function(){
-            if (++appsLoaded === numApps){
-              callback();
-            }
-          });
+        this.instantiateApp(appName, function(){
+          if (++appsLoaded === Apps.length - deferredApps){
+            callback();
+          }
         });
       };
+
+      if (Apps.length - deferredApps === 0) callback();
+      return this;
     }
 
   , setRegions: function(regions){
@@ -120,7 +104,7 @@ define(function(require){
       // Instantiate, render, and add to the dom if we haven't already
       var this_ = this, options = {};
       this.instantiateApp(appName, function(app){
-        app.render();
+        // app.render();
         callback(app);
       });
 
@@ -155,6 +139,9 @@ define(function(require){
     }
 
   , instantiateApp: function(appName, callback){
+      var appName = appName.substring(appName.lastIndexOf('!') + 1);
+
+      logger.info("[App.instantiate] - " + appName);
       if (!this.appExists(appName)){
         logger.warn("[App.instantiateApp] - App {app} does not exist", { app: appName });
         return this;
@@ -165,18 +152,36 @@ define(function(require){
         return this;
       }
 
-      if (this.Apps[appName]) return callback(this.apps[appName] = new this.Apps[appName]), this;
+      var this_ = this, app;
 
-      apps.get(appName, function(App){
-        this.Apps[appName] = App;
+      if (this.Apps[appName]){
+        console.log("lakjsdfkl");
+        app = this.apps[appName] = new this.Apps[appName]({
+          parent: this_
+        });
+        app.initApps(function(){
+          callback(app);
+        });
+        return this;
+      };
 
-        this.apps[appName] = new App({
+      appHandler.get(appName, function(error, App){
+        this_.Apps[appName] = App;
+
+        app = this_.apps[appName] = new App({
           // Convenience in case the app needs to know
-          baseUrl:  (this.baseUrl || "") + App.baseUrl
+          // baseUrl:  (this_._package.baseUrl || "") + App.baseUrl
           // Attach the app to the defined element
         // , $el:      App.$el
           // For application traversal
-        , parent: this
+          parent: this_
+        });
+
+        console.log(appName, app);
+
+
+        app.initApps(function(){
+          callback(app);
         });
       });
 

@@ -38,8 +38,16 @@ define(function(require){
         domready(function(){
           console.log("Domready");
           utils.dom(document.body).append(appSuite.$el);
+
+          appSuite.open('landing-site');
         });
       });
     });
   });
+
+  return {
+    open: function(appName){
+      appSuite.open(appName);
+    }
+  };
 });

@@ -5,6 +5,13 @@ define(function(require){
   ;
 
   return rad.App.extend({
-    "landing-site": "alksdjfl"
+    initialize: function(){
+    }
+  , render: function(){
+      this.$el.html("<h1>Landing Site</h1>");
+      console.log(this.apps['test-app']);
+      this.apps['test-app'].render();
+      this.$el.append(this.apps['test-app'].$el);
+    }
   });
 });

@@ -16,15 +16,15 @@ define(function(require){
     }
 
   , landing: function(){
-      this.app.openPage('landing');
+      console.log('landing');
     }
 
   , charities: function(){
-      this.app.openPage('charities');
+      console.log('charities');
     }
 
   , businesses: function(){
-      this.app.openPage('businesses');
+      console.log('businesses');
     }
   };
 });

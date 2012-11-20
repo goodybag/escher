@@ -21,7 +21,6 @@ define(function(require){
 
   return App.extend({
     constructor: function(options){
-console.log("suite constructor");
       App.prototype.constructor.apply(this, arguments);
 
       // If a top-level router has not been specified yet
@@ -35,7 +34,7 @@ console.log("suite constructor");
         // No router specified - we're just going to create a blank one
         else this.router = new utils.Router(defaultRouter);
       }
-console.log("suite constructor");
+
       var
         this_ = this
 
@@ -45,8 +44,8 @@ console.log("suite constructor");
           return function(){
             // Call to routers app.openApp with the appName and the last argument to route fn
             // Last argument will be the 'next' function when using middleware
+            var next = arguments[arguments.length - 1];
             currentApp.openApp(appName, function(){
-              var next = Array.prototype.slice.call(arguments, arguments.length - 1);
 
               /**
                * We shoudl use currentApp.getApp, but since we know it's already ready from
@@ -64,18 +63,18 @@ console.log("suite constructor");
           };
         }
 
-      , middleware = []
-      , baseUrl = ''
+      , diagram = {}
 
-      , evaluateRouters = function(parentApp){
+      , evaluateRouters = function(parentApp, baseUrl, middleware){
           var childAppName, childApp, router, route, Router;
 
           // Apply parent history
           baseUrl += parentApp.baseUrl || '';
-          middleware.push(ensureOpen(parentApp.name));
 
           for (var i = parentApp.apps.length -1; i >= 0; i--){
             childAppName = parentApp.apps[i];
+
+            middleware.push(ensureOpen(childAppName));
 
             // Get the actual app name after plugin behavior like defer
             if (childAppName.indexOf('!') > -1)
@@ -97,11 +96,14 @@ console.log("suite constructor");
 
                 // Prepend the parent middleware
                 Array.prototype.unshift.apply(router[router.routes[routePath]], middleware);
+
+                // Diagram everything so I can make sense of this shit
+                diagram[(baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || '') + '/' + routePath] = router[router.routes[routePath]].length;
               }
 
               Router = utils.SubRouter.extend(router);
               // we should save this instance somewhere, but for now it's fine
-              new Router(baseUrl + '/' + childApp.baseUrl || '', {
+              new Router((baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || ''), {
                 createTrailingSlashes: true
               });
             }
@@ -109,14 +111,17 @@ console.log("suite constructor");
             // Does the child have children?
             if (childApp.hasOwnProperty('apps')){
               // Run through the process for all apps
-              evaluateRouters(childApp);
+              evaluateRouters(childApp, baseUrl, middleware);
             }
+
+            middleware.pop();
           }
         }
       ;
-console.log("evaluating routers");
-      evaluateRouters(this._package);
+
+      evaluateRouters(this._package, '', []);
+
+      console.log("Routers: ", diagram);
     }
-  , test: "laksjdklfaf"
   });
 });

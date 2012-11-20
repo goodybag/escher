@@ -3,31 +3,29 @@ define(function(require){
     rad   = require('radagast')
   , utils = rad.utils
   , Suite = rad.Suite
-
-  , template = require('hbt!./../templates/suite')
   ;
 
   return Suite.extend({
-    template: template
+    className: 'applications'
 
   , initialize: function(options){
       // this.setRegions({
       //   '.apps-container': ['landing-site', 'consumer-panel'];
       // , '.nav': 'suite-navigation'
       // });
-      console.log("lkajsdf");
+      this.$el.html('<div class="main-app" />');
     }
 
   , open: function(appName){
       // this.region('.apps-container').open(appName);
 
-      this.html(this.template());
-
-      if (this.current) this.close(this.current);
+      // if (this.current) this.close(this.current);
+      console.log("opening ", appName);
       var this_ = this;
-      this.openApp(appName, function(app){
-        app.render();
+      this.instantiateApp(appName, function(app){
+        console.log("setting app");
         app.setElement(this_.$el.find('.main-app'));
+        app.render();
         this_.current = appName;
       });
     }
@@ -37,7 +35,6 @@ define(function(require){
       //   this.region('.apps-container').open(this.current);
       // }
 
-      this.$el.html(this.template());
     }
 
   , renderApp: function(){

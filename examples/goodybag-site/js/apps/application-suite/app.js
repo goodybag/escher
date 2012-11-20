@@ -10,15 +10,9 @@ define(function(require){
 
   , baseUrl: ''
 
-  // , apps: {
-  //     'landing-site':   'defer'
-  //   , 'consumer-panel': 'defer'
-  //   , 'suite-nav':       null
-  //   }
-
   , apps: [
       'defer!landing-site'
-    // , 'defer!consumer-panel'
+    , 'defer!consumer-panel'
     // , 'suite-nav'
     ]
 

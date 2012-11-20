@@ -12,7 +12,9 @@ define(function(require){
 
   , baseUrl: 'landing'
 
-  , apps: []
+  , apps: [
+      'test-app'
+    ]
 
   , prerequisites: []
   };
