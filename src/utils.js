@@ -4,22 +4,14 @@ define(function(require){
     $         = require('jquery')
   , _         = require('underscore')
   , Backbone  = require('backbone')
-  // , amanda    = require('amanda')
-  // , async     = require('async')
-
-    // App Dependencies
-  // , pubsub    = require('PubSubJS')
 
     // Module Variables
-  // , validator = amanda('json')
   , utils     = {}
   ;
 
   utils.noop = function(){};
 
   utils.dom = $;
-
-  require('backbone.subroute');
 
   utils.Backbone   = Backbone;
   utils.Events     = Backbone.Events;
@@ -31,9 +23,21 @@ define(function(require){
   utils.History    = Backbone.History;
 
   utils = _.extend(utils, _);
-  // utils = _.extend(utils, async);
 
-  // utils.pubsub = pubsub;
+  /**
+   * Ol' boy crockfords String interpolation
+   * @param  {String} str    The string you want to interpolate with
+   * @param  {Object} values The object mapping the keys in the string to values
+   * @return {String}        The result
+   * @example
+   *   "Hello, my name is {name}", { name: "Stacy" } => "Hello, my name is Stacy."
+   */
+  utils.interpolate = function(str, values){
+    return str.replace(/{([^{}]*)}/g, function(a, b){
+      var r = values[b];
+      return typeof r === 'string' || typeof r === 'number' ? r : a;
+    });
+  };
 
   return utils;
 });

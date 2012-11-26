@@ -8,6 +8,13 @@ define(function(require){
   return Suite.extend({
     className: 'applications'
 
+  , regions: {
+      '.main-app': [
+        'landing-site'
+      , 'consumer-panel'
+      ]
+    }
+
   , initialize: function(options){
       // this.setRegions({
       //   '.apps-container': ['landing-site', 'consumer-panel'];
@@ -16,7 +23,7 @@ define(function(require){
       this.$el.html('<div class="main-app" />');
     }
 
-  , open: function(appName){
+  , open: function(appName, callback){
       // this.region('.apps-container').open(appName);
 
       // if (this.current) this.close(this.current);
@@ -27,6 +34,7 @@ define(function(require){
         app.setElement(this_.$el.find('.main-app'));
         app.render();
         this_.current = appName;
+        if (callback) callback(app);
       });
     }
 

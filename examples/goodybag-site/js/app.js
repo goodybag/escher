@@ -32,22 +32,21 @@ define(function(require){
         console.log("Applicatin-suite apps initialized");
 
         // Start backbone history since everything is ready
-        utils.Backbone.history.start();
 
         // Put our suite into the dom when we can - which we probably can :)
         domready(function(){
           console.log("Domready");
           utils.dom(document.body).append(appSuite.$el);
 
-          appSuite.open('landing-site');
+          appSuite.open('consumer-panel', function(app){
+            utils.Backbone.history.start();
+          });
         });
       });
     });
   });
 
-  return {
-    open: function(appName){
-      appSuite.open(appName);
-    }
+  return function(){
+    return appSuite;
   };
 });

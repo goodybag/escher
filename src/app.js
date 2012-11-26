@@ -3,6 +3,7 @@ define(function(require){
     utils       = require('./utils')
   , logger      = require('./logger')
   , appHandler  = require('./apps-handler')
+  , Region      = require('./region')
   ;
 
   return utils.View.extend({
@@ -12,8 +13,33 @@ define(function(require){
       if (options && options.parent) this.parent = options.parent;
       this.apps = {};
       this.Apps = {};
-      console.log("app constructor");
+
+      // this.initializeRegions();
+
       utils.View.prototype.constructor.apply(this, arguments);
+    }
+
+    /**
+     * Creates an appRegions object that makes regions accessible
+     * by application name rather than by the region
+     * @return {[type]} [description]
+     */
+  , initializeRegions: function(){
+      var region;
+
+      this.appRegions = {};
+      for (var selector in this.regions){
+        region = this.regions[selector] = new Region(this, selector, this.regions[selector]);
+
+        if (region.isMulti()){
+          var apps = region.getAppName();
+          for (var i = apps.length - 1; i >= 0; i--){
+            this.appRegions[apps[i]] = region;
+          }
+        }else{
+          this.appRegions[region.getAppName()] = region;
+        }
+      }
     }
 
   , initApps: function(callback){
@@ -50,30 +76,6 @@ define(function(require){
       return this;
     }
 
-  , setRegions: function(regions){
-      for (var region in regions){
-        if (!(region in regions)) continue;
-        this.setRegion(region);
-      }
-      return this;
-    }
-
-  , setRegion: function(selector, application){
-      if (utils.isArray(application)){
-        // for ()
-      }else{
-        this._regions[selector] = application;
-      }
-    }
-
-  , wireApplicationToRegion: function(region, application){
-      // Ensure that we're not trying to wire a non-instantiated app
-      if (this.apps[application]){
-        // if the region is blank, then it's just the root element
-        this.apps[application].setElement(region !== '' ? this.$el.find(region) : this.$el);
-      }
-    }
-
   , addApp: function(App){
       if (this.appInstantiated(App)) this.destroyApp(App);
       this.Apps[app.name] = app;
@@ -97,26 +99,41 @@ define(function(require){
 
       callback = callback || utils.noop;
 
-      var App = this.Apps[appName];
+      // Chck with region the app belongs to
+      // var region = this.appRegions[appName];
 
-      if (this.appInstantiated(appName)) return callback(this.apps[appName]);
+      // App has already been instantiated
+      if (this.appInstantiated(appName)){
+        var app = this.apps[appName];
+
+        // Set the app to the region if it hasn't been done already
+        // Region will determine if it needs to append or setElement depending
+        // on whether or not it's a multi-app region
+        // if (!region.hasSetApp(appName)) region.setApp(app);
+
+        return callback(app);
+      }
 
       // Instantiate, render, and add to the dom if we haven't already
       var this_ = this, options = {};
-      this.instantiateApp(appName, function(app){
-        // app.render();
+
+      // Instantiate the app with the element setup with the corresponding region
+      // if (!region.isMulti()){
+        // options.$el = this.$el.find(region.selector)
+        // region._hasSetApp = true;
+      // }
+
+      this.instantiateApp(appName, options, function(app){
+        app.render();
+
+        // Append
+        // if (region.isMulti()){
+          // region.setApp(app);
+          // region.open(appName);
+        // }
+
         callback(app);
       });
-
-      // Old stuff when we had the page abstraction built in
-      // Once the app has been instantiated, pages loaded, rendered, and appended
-      // var goodToGo = function(){
-      //   // Check to see if the app has a page open - open the initial if not
-      //   if (!this_.current.current) this_.current.openPage(this_.current.initial);
-      //   this_.current.open();
-      //   callback();
-      // };
-
       return this;
     }
 
@@ -138,24 +155,29 @@ define(function(require){
       return !!this.apps[appName];
     }
 
-  , instantiateApp: function(appName, callback){
+  , instantiateApp: function(appName, options, callback){
+      if (typeof options === "function"){
+        callback = options;
+        options = {};
+      }
+      callback = callback || utils.noop;
+
       var appName = appName.substring(appName.lastIndexOf('!') + 1);
 
       logger.info("[App.instantiate] - " + appName);
       if (!this.appExists(appName)){
         logger.warn("[App.instantiateApp] - App {app} does not exist", { app: appName });
-        return this;
+        return callback(), this;
       }
 
       if (this.appInstantiated(appName)){
         logger.warn("[App.instantiateApp] - App {app} has already been instantiated", { app: appName });
-        return this;
+        return callback(), this;
       }
 
       var this_ = this, app;
 
       if (this.Apps[appName]){
-        console.log("lakjsdfkl");
         app = this.apps[appName] = new this.Apps[appName]({
           parent: this_
         });
@@ -176,8 +198,6 @@ define(function(require){
           // For application traversal
           parent: this_
         });
-
-        console.log(appName, app);
 
 
         app.initApps(function(){

@@ -17,23 +17,50 @@ define(function(require){
       }
       return args;
     }
+
+  , Logger = function(section){
+      this.section = section;
+    }
+
+  , logger
   ;
 
-  logger.info = function(){
-    console.log.apply(console, interpolate.apply({}, arguments));
+  Logger.prototype = {
+    log: function(type, args){
+      var output = (this.section ? "[{section}] - " : "");
+      // ensure array
+      args = Array.prototype.slice.call(interpolate.apply({}, args), 0);
+      args.unshift(
+        utils.interpolate(output, {
+          date: new Date().toString()
+        , section: this.section
+        })
+      );
+      console[type].apply(console, args);
+    }
+
+  , info: function(){
+      this.log.call(this, 'info', arguments);
+    }
+
+  , debug: function(){
+      this.log.call(this, 'debug', arguments);
+    }
+
+  , warn: function(){
+      this.log.call(this, 'warn', arguments);
+    }
+
+  , error: function(){
+      this.log.call(this, 'error', arguments);
+    }
   };
 
-  logger.debug = function(){
-    console.debug.apply(console, interpolate.apply({}, arguments));
-  };
+  // Make logger statically available
+  logger = new Logger();
+  for (var method in Logger.prototype){
+    Logger[method] = logger[method];
+  }
 
-  logger.warn = function(){
-    console.warn.apply(console, interpolate.apply({}, arguments));
-  };
-
-  logger.error = function(){
-    console.error.apply(console, interpolate.apply({}, arguments));
-  };
-
-  return logger;
+  return Logger;
 });
