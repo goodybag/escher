@@ -16,6 +16,11 @@ define(function(require){
   , appSuite
   ;
 
+  // Test pubsub
+  rad.subscribe('debug', function(msg, data) {
+    console.log('received pubsub message over \''+msg+'\'', data);
+  });
+
   // Register apps
   apps.add(appsList, function(){
     console.log("Apps added!");
@@ -39,6 +44,7 @@ define(function(require){
           utils.dom(document.body).append(appSuite.$el);
 
           appSuite.open('consumer-panel', function(app){
+            rad.publish('debug', {hello:'world'});
             utils.Backbone.history.start();
           });
         });
