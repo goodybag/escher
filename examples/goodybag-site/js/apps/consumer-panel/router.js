@@ -10,13 +10,13 @@ define(function(require){
     }
 
   , routes: {
-      "":                   "landing"
+      "":                   "index"
     , "charities":          "charities"
     , "businesses":         "businesses"
     }
 
-  , landing: function(){
-      console.log('landing');
+  , index: function(){
+      console.log('index');
     }
 
   , charities: function(){

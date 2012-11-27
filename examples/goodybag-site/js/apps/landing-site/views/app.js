@@ -5,13 +5,15 @@ define(function(require){
   ;
 
   return rad.App.extend({
-    initialize: function(){
+    regions: {
+      '.test-app': 'test-app'
+    }
+
+  , initialize: function(){
+
     }
   , render: function(){
-      this.$el.html("<h1>Landing Site</h1>");
-      console.log(this.apps['test-app']);
-      this.apps['test-app'].render();
-      this.$el.append(this.apps['test-app'].$el);
+      this.$el.html('<h1>Landing Site</h1><div class="test-app"></div>');
     }
   });
 });

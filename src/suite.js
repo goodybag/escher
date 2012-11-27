@@ -10,6 +10,8 @@ define(function(require){
   , App     = require('./app')
   , logger  = require('./logger')
 
+  , logger  = new logger("Suite")
+
   , defaultRouter = {
       routes: {
         "": "defaultRoute"
@@ -56,13 +58,9 @@ define(function(require){
                * Calling open, then I'm just going to dig into the reference right now
                */
 
+              // Advance the app so the next middleware can open it's child
               currentApp = isLast ? this_ : currentApp.apps[appName];
               next();
-
-              // currentApp.getApp(appName, function(app){
-              //   currentApp = app;
-              //   next();
-              // });
             });
           };
         }
@@ -101,7 +99,7 @@ define(function(require){
             childApp = apps.lookup(childAppName);
 
             // Apply parent middleware
-            middleware.push(ensureOpen(childAppName, !(childApp.apps && childApp.apps > 0)));
+            middleware.push(ensureOpen(childAppName, !(childApp.apps && childApp.apps.length > 0)));
             middlewareNames.push(childAppName);
 
             if (childApp.hasOwnProperty('router')){

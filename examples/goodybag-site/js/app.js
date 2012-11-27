@@ -18,29 +18,24 @@ define(function(require){
 
   // Register apps
   apps.add(appsList, function(){
-    console.log("Apps added!");
     // Get the application-suite class
     apps.get('application-suite', function(error, Suite){
       if (error) throw error;
-      console.log("Applicatin-suite acquired");
 
       // Kick off our application
       appSuite = new Suite();
+      appSuite.render();
 
       // Initialize all of the suites apps
       appSuite.initApps(function(){
-        console.log("Applicatin-suite apps initialized");
 
         // Start backbone history since everything is ready
 
         // Put our suite into the dom when we can - which we probably can :)
         domready(function(){
-          console.log("Domready");
           utils.dom(document.body).append(appSuite.$el);
 
-          appSuite.open('consumer-panel', function(app){
-            utils.Backbone.history.start();
-          });
+          utils.Backbone.history.start();
         });
       });
     });

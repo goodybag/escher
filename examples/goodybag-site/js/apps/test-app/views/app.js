@@ -6,6 +6,7 @@ define(function(require){
 
   return rad.App.extend({
     initialize: function(){
+      this.$el.html("<h2>Test App</h2>");
     }
   , render: function(){
       this.$el.html("<h2>Test App</h2>");
