@@ -30,7 +30,6 @@ define(function(require){
     Radagast.config = utils.defaults(newconfig, {
         apps  : []
       , el    : undefined
-      , ready : utils.noop
       }
     );
     // :NOTE: defaults() are run on the entire config -- not just the options passed in
