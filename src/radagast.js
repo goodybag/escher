@@ -50,6 +50,7 @@ define(function(require){
 
         // load the main application
         Radagast.mainApp = new AppCtor({ el:Radagast.config.el });
+        Radagast.mainApp.render();
         Radagast.mainApp.initApps(function(){
           console.log("Map app's apps initialized");
 

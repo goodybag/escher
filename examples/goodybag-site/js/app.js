@@ -19,7 +19,6 @@ define(function(require){
   });
 
   rad.start('application-suite', function(err, app) {
-    if (err) return console.log(err); 
-    app.open('consumer-panel');
+    if (err) return console.log(err);
   });
 });
