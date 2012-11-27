@@ -42,20 +42,14 @@ define(function(require){
 
     // register apps
     Radagast.apps.add(Radagast.config.apps, function(){
-      console.log("Apps added!");
-
       Radagast.apps.get(app_name, function(error, AppCtor){
         if (error) return cb(error);
-        console.log("Main app acquired");
-
         // load the main application
         Radagast.mainApp = new AppCtor({ el:Radagast.config.el });
         Radagast.mainApp.render();
         Radagast.mainApp.initApps(function(){
-          console.log("Map app's apps initialized");
 
           domready(function(){
-            console.log("Domready");
 
             // inject the suite into the dom, if needed
             if (typeof Radagast.config.el === 'undefined') {
