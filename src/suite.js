@@ -43,7 +43,13 @@ define(function(require){
 
       , currentApp = this
 
-      , ensureOpen = function(appName, isLast){
+      , initCurrentApp = function() {
+        var next = arguments[arguments.length - 1];
+        currentApp = this_;
+        next();
+      }
+
+      , ensureOpen = function(appName){
           return function(){
             // Call to routers app.openApp with the appName and the last argument to route fn
             // Last argument will be the 'next' function when using middleware
@@ -59,7 +65,7 @@ define(function(require){
                */
 
               // Advance the app so the next middleware can open it's child
-              currentApp = isLast ? this_ : currentApp.apps[appName];
+              currentApp = currentApp.apps[appName];
               next();
             });
           };
@@ -99,7 +105,7 @@ define(function(require){
             childApp = apps.lookup(childAppName);
 
             // Apply parent middleware
-            middleware.push(ensureOpen(childAppName, !(childApp.apps && childApp.apps.length > 0)));
+            middleware.push(ensureOpen(childAppName));
             middlewareNames.push(childAppName);
 
             if (childApp.hasOwnProperty('router')){
@@ -142,7 +148,7 @@ define(function(require){
         }
       ;
 
-      evaluateRouters(this._package, '', [], []);
+      evaluateRouters(this._package, '', [initCurrentApp], []);
 
       console.log("Routers: ", diagram);
     }
