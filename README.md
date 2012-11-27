@@ -17,7 +17,7 @@ While the project is far from complete and is still very mutable, we should keep
 
 ## What's the difference?
 
-There are more than one solutions to the very problem we're trying to solve. However, each solution fails in its own way. Please see the (https://github.com/goodybag/radagast/wiki/Differences-between-Marionette)[wiki] for differences.
+There are more than one solutions to the very problem we're trying to solve. However, each solution fails in its own way. Please see the [wiki](https://github.com/goodybag/radagast/wiki/Differences-between-Marionette) for differences.
 
 ## What does it look like
 
