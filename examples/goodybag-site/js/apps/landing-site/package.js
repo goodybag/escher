@@ -7,8 +7,13 @@ define(function(require){
     name: 'landing-site'
 
   , path: './views/app'
+  , routerPath: './router'
 
-  , router: require('./router')
+  , routes: {
+      "":                   "landing"
+    , "charities":          "charities"
+    , "businesses":         "businesses"
+  }
 
   , baseUrl: 'landing'
 
