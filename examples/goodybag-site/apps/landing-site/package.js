@@ -4,20 +4,20 @@
 
 define(function(require){
   return {
-    name:     'landing-site'
+    name: 'landing-site'
 
-  , path:     './views/app'
+  , path: './views/app'
+  , routerPath: './router'
 
-  , router:   require('./router')
+  , routes: {
+      "":                   "landing"
+    , "charities":          "charities"
+    , "businesses":         "businesses"
+  }
 
-  , baseUrl:  'landing'
+  , baseUrl: 'landing'
 
   , apps: []
-
-  , css: [
-      './css/jquery.fancybox'
-    , './css/video-js.min'
-    ]
 
   , prerequisites: []
   };

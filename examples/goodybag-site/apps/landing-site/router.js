@@ -11,12 +11,6 @@ define(function(require){
       this.app = options.app;
     }
 
-  , routes: {
-      "":                   "landing"
-    , "charities":          "charities"
-    , "businesses":         "businesses"
-    }
-
   , landing: function(){
       rad.publish('landing.changePageRequest', 'landing');
     }

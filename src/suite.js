@@ -43,14 +43,20 @@ define(function(require){
 
       , currentApp = this
 
-      , initCurrentApp = function() {
-          var next = arguments[arguments.length - 1];
+      , runMiddleware = function(middleware) {
+        return function Middleware__runMiddleware() {
+          var self = this, index = -1;
           currentApp = this_;
+          var next = function() {
+            return middleware[++index].apply(self, (index < middleware.length - 1) ? nextArgs : arguments);
+          };
+          var nextArgs = Array.prototype.concat.call(arguments, next);
           next();
         }
+      }
 
       , ensureOpen = function(appName){
-          return function(){
+          return function Middleware__ensureOpen(){
             // Call to routers app.openApp with the appName and the last argument to route fn
             // Last argument will be the 'next' function when using middleware
             var next = arguments[arguments.length - 1], this_ = this;
@@ -72,6 +78,15 @@ define(function(require){
           };
         }
 
+      , runRoute = function(handlerName) {
+        return function Middleware__runRoute() {
+          if (!currentApp._routeHandlers[handlerName]) {
+            throw "Route handler '"+handlerName+"' not found in "+currentApp._package.name;
+          }
+          currentApp._routeHandlers[handlerName].apply(currentApp._routeHandlers, arguments); 
+        }
+      }
+
       , diagram = {}
 
          /**
@@ -88,7 +103,7 @@ define(function(require){
           var
             childAppName  // - Value of each item in a parent app's apps property
           , childApp      // - The application manifest of a parent app's child app
-          , router        // - Clone of the child app's router property
+          , routes        // - Clone of the child app's routes property
           , route         // - Each route endpoint (function) for a child app
           , fullPath      // - Full path including inherited baseUrl
           ;
@@ -109,28 +124,23 @@ define(function(require){
             middleware.push(ensureOpen(childAppName));
             middlewareNames.push(childAppName);
 
-            if (childApp.hasOwnProperty('router')){
-              router = utils.clone(childApp.router);
+            if (childApp.hasOwnProperty('routes')){
+              routes = utils.clone(childApp.routes);
 
               // Loop through all routes and mixin parent middleware
-              for (var routePath in router.routes){
-                if (!router.routes.hasOwnProperty(routePath)) continue;
+              for (var routePath in routes){
+                if (!routes.hasOwnProperty(routePath)) continue;
 
-                route = router[router.routes[routePath]];
-
-                // Force the route to start using middleware-style
-                if (typeof route === "function") router[router.routes[routePath]] = [route];
-
-                // Prepend the parent middleware
-                Array.prototype.unshift.apply(router[router.routes[routePath]], middleware);
+                // Add route handler loader middleware
+                route = middleware.concat(runRoute(routes[routePath]));
 
                 // Create the full route with inherited baseUrl
                 fullPath = (baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || '') + '/' + routePath;
 
                 // Add to the main router
-                this_.router.route(fullPath, fullPath, router[router.routes[routePath]]);
+                this_.router.route(fullPath, fullPath, runMiddleware(route));
                 // Also add one with a trailing slash
-                this_.router.route(fullPath + '/', fullPath + '/', router[router.routes[routePath]]);
+                this_.router.route(fullPath + '/', fullPath + '/', runMiddleware(route));
 
                 // Diagram everything so I can make sense of this shit
                 diagram[fullPath] = middlewareNames.slice(0);
@@ -149,7 +159,7 @@ define(function(require){
         }
       ;
 
-      evaluateRouters(this._package, '', [initCurrentApp], []);
+      evaluateRouters(this._package, '', [], []);
 
       console.log("Routers: ", diagram);
     }
