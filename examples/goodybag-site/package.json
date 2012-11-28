@@ -1,0 +1,27 @@
+{
+  "name": "goodybag-site",
+  "version": "0.1.0",
+  "description": "An example project for radagast",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "John Fawcett",
+  "license": "BSD",
+
+  "dependencies": {
+    "domReady": null,
+    "jquery": null,
+    "underscore": null,
+    "hbt": null
+  },
+
+  "jam": {
+    "dependencies": {
+      "domReady": null,
+      "jquery": null,
+      "underscore": null,
+      "hbt": null
+    }
+  }
+}
