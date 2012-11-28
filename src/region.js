@@ -45,7 +45,7 @@ define(function(require){
   Region.prototype.setApp = function(app){
     logger.debug("set app", this.selector);
 
-    var $el = this.parent.$el.find(this.selector);
+    var $el = this.selector === "" ? this.parent.$el : this.parent.$el.find(this.selector);
 
     // Multi-application regions have swap and append functionality
     if (this.isMulti()){
