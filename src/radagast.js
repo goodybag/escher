@@ -24,19 +24,6 @@ define(function(require){
   , mainApp     : null
   };
 
-  function config(options) {
-    var newconfig = utils.extend(Radagast.config, options);
-    // store configuration in this function object
-    Radagast.config = utils.defaults(newconfig, {
-        apps  : []
-      , el    : undefined
-      }
-    );
-    // :NOTE: defaults() are run on the entire config -- not just the options passed in
-    // if defaults() were run on the options parameter, then config() could not be called twice
-    // (the defaults would overwrite existing config)
-  }
-
   function start(app_name, cb) {
     cb = cb || fallback_cb;
 

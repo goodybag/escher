@@ -1,7 +1,7 @@
 define(function(require){
   var
     utils   = require('./utils')
-  // , errors  = require('./errors')
+  , config  = require('./config')
 
   , Handler = (function(){
       var constructor = function(){
@@ -24,6 +24,10 @@ define(function(require){
           if (typeof package === "string"){
             package = [package];
           }
+
+          for (var i = package.length - 1; i >= 0; i--){
+            package[i] += '/' + config.packageName
+          };
 
           if (!utils.isArray(package)) throw new Error('Invalid package type');
 

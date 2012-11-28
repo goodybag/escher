@@ -11,10 +11,10 @@ define(function(require){
 
   rad.config({
     apps:[
-      'apps/application-suite/app'
-    , 'apps/landing-site/app'
-    , 'apps/consumer-panel/app'
-    , 'apps/test-app/app'
+      'apps/application-suite'
+    , 'apps/landing-site'
+    , 'apps/consumer-panel'
+    , 'apps/test-app'
     ]
   });
 
