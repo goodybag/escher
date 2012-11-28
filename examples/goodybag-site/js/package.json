@@ -9,18 +9,8 @@
   "author": "John Fawcett",
   "license": "BSD",
 
-  "dependencies": {
-    "domReady": null,
-    "jquery": null,
-    "underscore": null,
-    "hbt": null
-  },
-
   "jam": {
     "dependencies": {
-      "domReady": null,
-      "jquery": null,
-      "underscore": null,
       "hbt": null
     }
   }

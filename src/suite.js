@@ -43,14 +43,20 @@ define(function(require){
 
       , currentApp = this
 
-      , initCurrentApp = function() {
-          var next = arguments[arguments.length - 1];
+      , runMiddleware = function(middleware) {
+        return function Middleware__runMiddleware() {
+          var self = this, index = -1;
           currentApp = this_;
+          var next = function() {
+            return middleware[++index].apply(self, (index < middleware.length - 1) ? nextArgs : arguments);
+          };
+          var nextArgs = Array.prototype.concat.call(arguments, next);
           next();
         }
+      }
 
       , ensureOpen = function(appName){
-          return function(){
+          return function Middleware__ensureOpen(){
             // Call to routers app.openApp with the appName and the last argument to route fn
             // Last argument will be the 'next' function when using middleware
             var next = arguments[arguments.length - 1];
@@ -72,7 +78,7 @@ define(function(require){
         }
 
       , runRoute = function(handlerName) {
-        return function() {
+        return function Middleware__runRoute() {
           if (!currentApp._routeHandlers[handlerName]) {
             throw "Route handler '"+handlerName+"' not found in "+currentApp._package.name;
           }
@@ -131,9 +137,9 @@ define(function(require){
                 fullPath = (baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || '') + '/' + routePath;
 
                 // Add to the main router
-                this_.router.route(fullPath, fullPath, route);
+                this_.router.route(fullPath, fullPath, runMiddleware(route));
                 // Also add one with a trailing slash
-                this_.router.route(fullPath + '/', fullPath + '/', route);
+                this_.router.route(fullPath + '/', fullPath + '/', runMiddleware(route));
 
                 // Diagram everything so I can make sense of this shit
                 diagram[fullPath] = middlewareNames.slice(0);
@@ -152,7 +158,7 @@ define(function(require){
         }
       ;
 
-      evaluateRouters(this._package, '', [initCurrentApp], []);
+      evaluateRouters(this._package, '', [], []);
 
       console.log("Routers: ", diagram);
     }

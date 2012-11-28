@@ -2,7 +2,7 @@ define(function(require){
    var
     // 3rd Party Dependencies
     $         = require('jquery')
-  , _         = require('underscore')
+  , _         = require('lodash')
   , Backbone  = require('backbone')
   , domready  = require('domReady')
 
