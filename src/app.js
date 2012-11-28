@@ -2,6 +2,7 @@ define(function(require){
   var
     utils       = require('./utils')
   , logger      = require('./logger')
+  , pubsub      = require('./pubsub')
   , appHandler  = require('./apps-handler')
   , Region      = require('./region')
   ;
@@ -196,6 +197,7 @@ define(function(require){
 
         // Initialize any child apps
         app.initApps(function(){
+          pubsub.publish('app.instantiate', app);
           callback(app);
         });
 
