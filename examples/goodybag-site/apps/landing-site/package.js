@@ -4,17 +4,15 @@
 
 define(function(require){
   return {
-    name: 'landing-site'
+    name:     'landing-site'
 
-  , path: './views/app'
+  , path:     './views/app'
 
-  , router: require('./router')
+  , router:   require('./router')
 
-  , baseUrl: 'landing'
+  , baseUrl:  'landing'
 
-  , apps: [
-      'test-app'
-    ]
+  , apps: []
 
   , css: [
       './css/jquery.fancybox'

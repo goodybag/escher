@@ -1,11 +1,12 @@
 define(function(require){
   var
     utils     = require('utils')
-  , Page      = require('views/page')
-  , template  = require('hbt!./../templates/landing-page')
+  , template  = require('hbt!./../html/landing-page')
   ;
 
-  return Page.extend({
-    template: template
+  return utils.View.extend({
+    initialize: function(){
+      this.$el.html(template());
+    }
   });
 });

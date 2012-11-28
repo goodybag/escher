@@ -5,9 +5,7 @@ require.config({
 });
 
 define(function(require){
-  var
-    rad = require('radagast')
-  ;
+  var rad = require('radagast');
 
   rad.config({
     apps:[

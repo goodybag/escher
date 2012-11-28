@@ -53,7 +53,7 @@ define(function(require){
           return function(){
             // Call to routers app.openApp with the appName and the last argument to route fn
             // Last argument will be the 'next' function when using middleware
-            var next = arguments[arguments.length - 1];
+            var next = arguments[arguments.length - 1], this_ = this;
 
             appName = appName.substring(appName.lastIndexOf('!') + 1);
 
@@ -66,6 +66,7 @@ define(function(require){
 
               // Advance the app so the next middleware can open it's child
               currentApp = currentApp.apps[appName];
+              this_.app = currentApp;
               next();
             });
           };

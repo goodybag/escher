@@ -15,9 +15,9 @@ define(function(require){
       this.apps = {};
       this.Apps = {};
 
-      this.initializeRegions();
-
       utils.View.prototype.constructor.apply(this, arguments);
+
+      this.initializeRegions();
     }
 
     /**
@@ -31,15 +31,20 @@ define(function(require){
       for (var selector in this.regions){
         region = this.regions[selector] = new Region(this, selector, this.regions[selector]);
 
+        // Don't do anything for regular views
+        if (region.isView()) continue;
+
         if (region.isMulti()){
           var apps = region.getAppName();
           for (var i = apps.length - 1; i >= 0; i--){
             this.appRegions[apps[i]] = region;
           }
-        }else{
+        } else {
           this.appRegions[region.getAppName()] = region;
         }
       }
+
+      return this;
     }
 
   , initApps: function(callback){
@@ -87,12 +92,11 @@ define(function(require){
       return this.apps[appName];
     }
 
-    /* complete later
-  , getApp: function(appName, callback){
-      if ()
-
-      if (this.appInstantiated(appName)) return callback(this.apps[appName]), this;
-    }*/
+  , renderViewRegions: function(){
+      for (var region in this.regions){
+        if (this.regions[region].isView()) this.regions[region].render();
+      }
+    }
 
   , openApp: function(appName, callback){
       if (!this.appExists(appName))
@@ -139,11 +143,14 @@ define(function(require){
         // Everything set, finally render the view in the region
         region.render();
 
+        app.renderViewRegions();
+
         // Initialize any child apps
         app.initApps(function(){
           callback(null, app);
         });
       });
+
       return this;
     }
 

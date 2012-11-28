@@ -3,9 +3,14 @@
  *
  * Manages Child-App/DOM relationships
  *
+ * [11-27-2012]
  * It might be a good idea to make the distinction of regions and
  * multi-app regions a little more clear by making them different classes.
  * For now, we'll leave it as it is.
+ *
+ * [11-28-2012]
+ * This thing is getting more and more janky. Now it has regular view support
+ * and the old variable names and abstractions aren't really fitting anymore
  */
 
 define(function(require){
@@ -21,14 +26,19 @@ define(function(require){
       , selector: selector
       });
 
-      if (utils.isArray(appName)) this._isMulti = true;
-
       this.parent       = parent;
       this.selector     = selector;
       this.appName      = appName;
+      this._isMulti     = utils.isArray(appName)
       this._hasSetApp   = false;
+      this._isView      = (typeof appName === "object" && appName.cid);
       this.setApps      = {};
       this.current      = null;
+
+      // Crude check to see if the multi is a view multi
+      if (this.isMulti()){
+        this._isView = (typeof appName[0] === "object" && appName[0].cid);
+      }
     }
   ;
 
@@ -92,6 +102,7 @@ define(function(require){
       this.current.undelegateEvents();
       $el.html("");
     }
+
     logger.debug("Setting el", this.selector, app, $el.length);
     app.setElement($el);
     this.current = app;
@@ -108,6 +119,10 @@ define(function(require){
     return this._isMulti;
   };
 
+  Region.prototype.isView = function(){
+    return this._isView;
+  };
+
   Region.prototype.open = function(appName){
     if (!this.isMulti()) return this;
 
@@ -121,7 +136,8 @@ define(function(require){
   };
 
   Region.prototype.render = function(){
-    logger.debug("Rendering", this.selector);
+    logger.debug("Rendering", this.selector, this.current);
+    if (this.isView() && !this.hasSetApp()) this.setApp(this.appName);
     this.current.render();
     return this;
   };

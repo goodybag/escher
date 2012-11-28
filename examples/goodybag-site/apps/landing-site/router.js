@@ -3,6 +3,8 @@
  */
 
 define(function(require){
+  var rad = require('radagast');
+
   return {
     initialize: function(options){
       // An instance the application will be passed to the route
@@ -16,11 +18,11 @@ define(function(require){
     }
 
   , landing: function(){
-      console.log('landing');
+      rad.publish('landing.changePageRequest', 'landing');
     }
 
   , charities: function(){
-      console.log('charities');
+      rad.publish('landing.changePageRequest', 'charities');
     }
 
   , businesses: function(){

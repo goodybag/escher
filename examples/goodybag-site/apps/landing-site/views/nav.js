@@ -1,8 +1,14 @@
+/**
+ * Navigation
+ */
+
 define(function(require){
   var
-    utils     = require('utils')
-  , logger    = require('logger')
-  , template  = require('hbt!./../templates/nav')
+    rad       = require('radagast')
+  , utils     = require('utils')
+  , template  = require('hbt!./../html/nav')
+
+  , logger    = new rad.logger("LandingSite.Nav")
   ;
 
   return utils.View.extend({

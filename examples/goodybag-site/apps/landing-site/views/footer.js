@@ -1,8 +1,10 @@
 define(function(require){
   var
-    utils     = require('utils')
-  , logger    = require('logger')
-  , template  = require('hbt!./../templates/footer')
+    rad       = require('radagast')
+  , utils     = require('utils')
+  , template  = require('hbt!./../html/footer')
+
+  , logger    = new rad.logger("LandingSite.Footer")
   ;
 
   return utils.View.extend({
@@ -11,10 +13,10 @@ define(function(require){
     , 'mouseleave': 'onMouseLeave'
     }
 
-  , initialize: function(){
+  , initialize: function(options){
       this.template = template;
 
-      this.slideMode = false;
+      this.slideMode = (options && options.slideMode !== undefined) ? options.slideMode : true;
       this.animating = false;
       this.shown     = false;
 
@@ -22,8 +24,13 @@ define(function(require){
     }
 
   , render: function(){
+      // We're re-rendering which will put it not in slide mode by default
+      // So let's keep track of previous state
+      var wasInSlideMode  = this.slideMode;
+      this.slideMode      = false;
       this.$el.html(this.template());
       this.$slide = this.$el.find('.slide');
+      if (wasInSlideMode) this.enterSlideMode();
       return this;
     }
 
@@ -72,13 +79,14 @@ define(function(require){
 
   , onMouseEnter: function(e){
       if (!this.slideMode || this.animating) return false;
+      logger.info("Mouse Enter");
       this.show();
       this.trigger('mouseenter', e);
     }
 
   , onMouseLeave: function(e){
       if (!this.slideMode || this.animating) return false;
-      console.log('hide');
+      logger.info("Mouse Leave");
       this.hide();
       this.trigger('mouseleave', e);
     }
