@@ -44,10 +44,10 @@ define(function(require){
       , currentApp = this
 
       , initCurrentApp = function() {
-        var next = arguments[arguments.length - 1];
-        currentApp = this_;
-        next();
-      }
+          var next = arguments[arguments.length - 1];
+          currentApp = this_;
+          next();
+        }
 
       , ensureOpen = function(appName){
           return function(){
