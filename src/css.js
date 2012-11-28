@@ -28,18 +28,18 @@ define(function(require){
 
   pubsub.subscribe('app.instantiate', function(msg, app){
     if (app._package.css){
-      var css = app._package.css, el ;
-      for (var i = css.length - 1; i >= 0; i--){
-        css[i] = 'text!' + css[i].replace('./', app._package.appDirectory + '/') + '.css'
+      logger.info("Parsing application CSS");
+
+      var paths = app._package.css, el, ids = [];
+      for (var i = paths.length - 1; i >= 0; i--){
+        paths[i] = 'text!' + (ids[i] = paths[i].replace('./', app._package.appDirectory + '/')) + '.css'
       }
 
-      logger.info(css);
-
-      require(css, function(){
-        for (var i = css.length - 1, style; i >= 0; i--) {
-          style = createStyle(css[i], arguments[i]);
+      require(paths, function(){
+        for (var i = ids.length - 1, style; i >= 0; i--) {
+          style = createStyle(ids[i], arguments[i]);
           document.head.appendChild(style);
-          els[css[i]] = style;
+          els[ids[i]] = style;
         };
       });
     }
