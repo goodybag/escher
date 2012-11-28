@@ -12,7 +12,6 @@ define(function(require){
       'apps/application-suite'
     , 'apps/landing-site'
     , 'apps/consumer-panel'
-    , 'apps/test-app'
     ]
   });
 
