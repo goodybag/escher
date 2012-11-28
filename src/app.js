@@ -195,11 +195,8 @@ define(function(require){
       if (this.Apps[appName]){
         app = this.apps[appName] = new this.Apps[appName](options);
 
-        // Initialize any child apps
-        app.initApps(function(){
-          pubsub.publish('app.instantiate', app);
-          callback(app);
-        });
+        pubsub.publish('app.instantiate', app);
+        callback(app);
 
         return this;
       };
@@ -213,6 +210,7 @@ define(function(require){
 
         app = this_.apps[appName] = new App(options);
 
+        pubsub.publish('app.instantiate', app);
         callback(null, app);
       });
 

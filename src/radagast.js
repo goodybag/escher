@@ -8,10 +8,11 @@ define(function(require){
   , App         : require('./src/app')
   , Suite       : require('./src/suite')
   , logger      : require('./src/logger')
+  , config      : require('./src/config')
+  , css         : require('./src/css')
   , publish     : pubsub.publish
   , subscribe   : pubsub.subscribe
   , unsubscribe : pubsub.unsubscribe
-  , config      : require('./src/config')
 
     // methods
   , start       : start
