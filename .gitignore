@@ -1,6 +1,5 @@
 .DS_Store
 src/jam/*
 !src/jam/jam.json
-examples/goodybag-site/js/jam/*
-!examples/goodybag-site/js/jam/jam.json
+examples/goodybag-site/jam/*
 *~
