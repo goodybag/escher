@@ -71,6 +71,15 @@ define(function(require){
           };
         }
 
+      , runRoute = function(handlerName) {
+        return function() {
+          if (!currentApp._routeHandlers[handlerName]) {
+            throw "Route handler '"+handlerName+"' not found in "+currentApp._package.name;
+          }
+          currentApp._routeHandlers[handlerName].apply(currentApp._routeHandlers, arguments); 
+        }
+      }
+
       , diagram = {}
 
          /**
@@ -87,7 +96,7 @@ define(function(require){
           var
             childAppName  // - Value of each item in a parent app's apps property
           , childApp      // - The application manifest of a parent app's child app
-          , router        // - Clone of the child app's router property
+          , routes        // - Clone of the child app's routes property
           , route         // - Each route endpoint (function) for a child app
           , fullPath      // - Full path including inherited baseUrl
           ;
@@ -108,28 +117,23 @@ define(function(require){
             middleware.push(ensureOpen(childAppName));
             middlewareNames.push(childAppName);
 
-            if (childApp.hasOwnProperty('router')){
-              router = utils.clone(childApp.router);
+            if (childApp.hasOwnProperty('routes')){
+              routes = utils.clone(childApp.routes);
 
               // Loop through all routes and mixin parent middleware
-              for (var routePath in router.routes){
-                if (!router.routes.hasOwnProperty(routePath)) continue;
+              for (var routePath in routes){
+                if (!routes.hasOwnProperty(routePath)) continue;
 
-                route = router[router.routes[routePath]];
-
-                // Force the route to start using middleware-style
-                if (typeof route === "function") router[router.routes[routePath]] = [route];
-
-                // Prepend the parent middleware
-                Array.prototype.unshift.apply(router[router.routes[routePath]], middleware);
+                // Add route handler loader middleware
+                route = middleware.concat(runRoute(routes[routePath]));
 
                 // Create the full route with inherited baseUrl
                 fullPath = (baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || '') + '/' + routePath;
 
                 // Add to the main router
-                this_.router.route(fullPath, fullPath, router[router.routes[routePath]]);
+                this_.router.route(fullPath, fullPath, route);
                 // Also add one with a trailing slash
-                this_.router.route(fullPath + '/', fullPath + '/', router[router.routes[routePath]]);
+                this_.router.route(fullPath + '/', fullPath + '/', route);
 
                 // Diagram everything so I can make sense of this shit
                 diagram[fullPath] = middlewareNames.slice(0);

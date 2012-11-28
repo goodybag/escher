@@ -9,12 +9,6 @@ define(function(require){
       this.app = options.app;
     }
 
-  , routes: {
-      "":                   "index"
-    , "charities":          "charities"
-    , "businesses":         "businesses"
-    }
-
   , index: function(){
       console.log('index');
     }
