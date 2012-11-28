@@ -1,5 +1,8 @@
 define(function(require){
-  var config = function(options) {
+  var
+    utils    = require('./utils')
+
+  , config = function(options) {
     var newconfig = utils.extend(config, options);
     // store configuration in this function object
     config = utils.defaults(newconfig, {

@@ -4,6 +4,7 @@ define(function(require){
     $         = require('jquery')
   , _         = require('underscore')
   , Backbone  = require('backbone')
+  , domready  = require('domReady')
 
     // Module Variables
   , utils     = {}
@@ -23,6 +24,8 @@ define(function(require){
   utils.History    = Backbone.History;
 
   utils = _.extend(utils, _);
+
+  utils.domready = domready;
 
   /**
    * Ol' boy crockfords String interpolation

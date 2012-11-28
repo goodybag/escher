@@ -1,13 +1,9 @@
 define(function(require){
-  var
-    pubsub = require('./src/pubsub')
-  , utils = require('./src/utils')
-  , domready = require('domReady')
-  ;
+  var pubsub = require('./src/pubsub');
 
   var Radagast = {
     // imported APIs
-    utils       : utils
+    utils       : require('./src/utils')
   , apps        : require('./src/apps-handler')
   , App         : require('./src/app')
   , Suite       : require('./src/suite')
@@ -15,9 +11,9 @@ define(function(require){
   , publish     : pubsub.publish
   , subscribe   : pubsub.subscribe
   , unsubscribe : pubsub.unsubscribe
+  , config      : require('./src/config')
 
     // methods
-  , config      : config
   , start       : start
 
     // attributes
@@ -36,16 +32,16 @@ define(function(require){
         Radagast.mainApp.render();
         Radagast.mainApp.initApps(function(){
 
-          domready(function(){
+          Radagast.utils.domready(function(){
 
             // inject the suite into the dom, if needed
             if (typeof Radagast.config.el === 'undefined') {
-              var $el = utils.dom(document.body);
+              var $el = Radagast.utils.dom(document.body);
               $el.append(Radagast.mainApp.$el);
             }
 
             // start listening to navigation changes
-            utils.Backbone.history.start();
+            Radagast.utils.Backbone.history.start();
 
             // away we go
             cb(undefined, Radagast.mainApp);
