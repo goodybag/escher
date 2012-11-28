@@ -32,10 +32,11 @@ Typically, you will setup your directory structure with something like this:
       - templates/
       - views/
         app.js        // Main application view
-      app.js          // Application manifest file
+      package.js      // Application manifest file
+      router.js       // Application router
 ```
 
-Application manifests contain just enough information to get the application registered in the application handler. It should not contain any logic outside of the routes used for the app
+Application manifests contain just enough information to get the application registered in the application handler. It should not contain any logic.
 
 ```javascript
 /**
@@ -50,33 +51,14 @@ define(function(require){
   ;
 
   return {
-    appViewPath: './views/app'
+    path: './views/app'
 
-  , router: {
-      initialize: function(options){
-        // An instance the application will be passed to the route
-        this.app = options.app;
-      }
-
-    , routes: {
-        "":                   "landing"
-      , "charities":          "charities"
-      , "businesses":         "businesses"
-      }
-
-    , landing: function(){
-        this.app.openPage('landing');
-      }
-
-    , charities: function(){
-        this.app.openPage('charities');
-      }
-
-    , businesses: function(){
-        this.app.openPage('businesses');
-      }
+  , routes: {
+      "":                   "landing"
+    , "charities":          "charities"
+    , "businesses":         "businesses"
     }
-
+  
   , permissions: {
       /* Do something here I'm not quite sure yet */
     }
@@ -92,6 +74,35 @@ define(function(require){
     }
   };
 });
+```
+
+Your router.js file then defines the logic for route handlers:
+
+```javascript
+/**
+ * Landing Page Route Handlers
+ */
+define(function(require) {
+  return {
+    initialize: function(options){
+      // An instance the application will be passed to the route
+      this.app = options.app;
+    }
+
+  , landing: function(){
+      this.app.openPage('landing');
+    }
+
+  , charities: function(){
+      this.app.openPage('charities');
+    }
+
+  , businesses: function(){
+      this.app.openPage('businesses');
+    }
+  }
+});
+
 ```
 
 Notice that router is not a Backbone.Router class. Since route paths are relative to where the application is instantiated, we need to do some custom work to the router when it's created based on where the app is required. For that reason, all we need is an object that describes the router class, not the actual class itself.

@@ -8,7 +8,11 @@ define(function(require){
 
   , path: './views/app'
 
-  , router: require('./router')
+  , routes:{
+      "":                   "index"
+    , "charities":          "charities"
+    , "businesses":         "businesses"
+  }
 
   , baseUrl: 'panel'
 

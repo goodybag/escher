@@ -40,7 +40,8 @@ define(function(require){
               app.appDirectory = app.appDirectory || package[i].substring(0, package[i].lastIndexOf('/'));
 
               // ./ refers to this modules reference, not what the user was intending
-              app.path = app.path.replace('./', app.appDirectory + '/')
+              app.path = app.path.replace('./', app.appDirectory + '/');
+              app.routerPath = (app.routerPath) ? (app.routerPath.replace('./', app.appDirectory + '/')) : (app.appDirectory + '/router');
             };
             callback();
           });
@@ -72,9 +73,11 @@ define(function(require){
           if (!this.isLoaded(name)){
             var this_ = this, app = this.apps[name];
 
-            return require([app.path], function(module){
+            return require([app.path, app.routerPath], function(module, routeHandlers){
               // save some references for instance object
               module.prototype._package = app;
+              module.prototype._routeHandlers = routeHandlers;
+
               // Tell handler we've loaded this module
               this_.loaded[name] = module;
               callback(null, module);
