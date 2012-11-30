@@ -27,12 +27,15 @@ define(function(require){
       App.prototype.constructor.apply(this, arguments);
 
       // If a top-level router has not been specified yet
-      if (!utils.history){
+      if (!utils.Backbone.history && utils.Backbone.history.handlers.length > 0){
         // Top level router has already been specified and we're passing in an instance
         if (options && options.router) this.router = options.router;
 
         // Specified Router definition, creating top-level router
         else if (options && options.Router) this.router = new utils.Router(options.Router);
+
+        // Use router specified in package
+        else if (this._package.router) this.router = new utils.Router(this._package.router);
 
         // No router specified - we're just going to create a blank one
         else this.router = new utils.Router(defaultRouter);
@@ -44,16 +47,16 @@ define(function(require){
       , currentApp = this
 
       , runMiddleware = function(middleware) {
-        return function Middleware__runMiddleware() {
-          var self = this, index = -1;
-          currentApp = this_;
-          var next = function() {
-            return middleware[++index].apply(self, (index < middleware.length - 1) ? nextArgs : arguments);
-          };
-          var nextArgs = Array.prototype.concat.call(arguments, next);
-          next();
+          return function Middleware__runMiddleware() {
+            var self = this, index = -1;
+            currentApp = this_;
+            var next = function() {
+              return middleware[++index].apply(self, (index < middleware.length - 1) ? nextArgs : arguments);
+            };
+            var nextArgs = Array.prototype.concat.call(arguments, next);
+            next();
+          }
         }
-      }
 
       , ensureOpen = function(appName){
           return function Middleware__ensureOpen(){
@@ -79,13 +82,13 @@ define(function(require){
         }
 
       , runRoute = function(handlerName) {
-        return function Middleware__runRoute() {
-          if (!currentApp._routeHandlers[handlerName]) {
-            throw "Route handler '"+handlerName+"' not found in "+currentApp._package.name;
+          return function Middleware__runRoute() {
+            if (!currentApp._routeHandlers[handlerName]) {
+              throw "Route handler '"+handlerName+"' not found in "+currentApp._package.name;
+            }
+            currentApp._routeHandlers[handlerName].apply(currentApp._routeHandlers, arguments);
           }
-          currentApp._routeHandlers[handlerName].apply(currentApp._routeHandlers, arguments); 
         }
-      }
 
       , diagram = {}
 
