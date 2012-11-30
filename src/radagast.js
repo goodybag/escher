@@ -1,15 +1,15 @@
 define(function(require){
-  var pubsub = require('./src/pubsub');
+  var pubsub = require('radagast/src/pubsub');
 
   var Radagast = {
     // imported APIs
-    utils       : require('./src/utils')
-  , apps        : require('./src/apps-handler')
-  , App         : require('./src/app')
-  , Suite       : require('./src/suite')
-  , logger      : require('./src/logger')
-  , config      : require('./src/config')
-  , css         : require('./src/css')
+    utils       : require('radagast/src/utils')
+  , apps        : require('radagast/src/apps-handler')
+  , App         : require('radagast/src/app')
+  , Suite       : require('radagast/src/suite')
+  , logger      : require('radagast/src/logger')
+  , config      : require('radagast/src/config')
+  , css         : require('radagast/src/css')
   , publish     : pubsub.publish
   , subscribe   : pubsub.subscribe
   , unsubscribe : pubsub.unsubscribe
