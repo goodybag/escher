@@ -73,14 +73,17 @@ define(function(require){
           if (!this.isLoaded(name)){
             var this_ = this, app = this.apps[name];
 
-            return require([app.path, app.routerPath], function(module, routeHandlers){
-              // save some references for instance object
-              module.prototype._package = app;
-              module.prototype._routeHandlers = routeHandlers;
+            return require([app.path], function(module){
+              // include app.path first, as the router will be defined in that file if compiled
+              require([app.routerPath], function(routeHandlers){
+                // save some references for instance object
+                module.prototype._package = app;
+                module.prototype._routeHandlers = routeHandlers;
 
-              // Tell handler we've loaded this module
-              this_.loaded[name] = module;
-              callback(null, module);
+                // Tell handler we've loaded this module
+                this_.loaded[name] = module;
+                callback(null, module);
+              });
             }), this;
           }
           return callback(null, this.loaded[name]), this;
