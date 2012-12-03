@@ -62,6 +62,7 @@ define(function(require){
         rad.publish('landing.footer.exitSlideMode');
       }else{
         utils.dom(document.body).removeClass('index');
+        rad.publish('landing.footer.enterSlideMode');
       }
 
       if (this.currentPage) this.pages[this.currentPage].$el.css('display', 'none');
