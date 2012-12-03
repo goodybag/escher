@@ -27,7 +27,7 @@ define(function(require){
       App.prototype.constructor.apply(this, arguments);
 
       // If a top-level router has not been specified yet
-      if (!utils.Backbone.history && utils.Backbone.history.handlers.length > 0){
+      if (!utils.Backbone.history || utils.Backbone.history.handlers.length === 0){
         // Top level router has already been specified and we're passing in an instance
         if (options && options.router) this.router = options.router;
 
@@ -138,7 +138,9 @@ define(function(require){
                 route = middleware.concat(runRoute(routes[routePath]));
 
                 // Create the full route with inherited baseUrl
-                fullPath = (baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || '') + '/' + routePath;
+                if (routePath === '') fullPath = baseUrl + childApp.baseUrl;
+                else if (baseUrl === '') fullPath = (childApp.baseUrl || '') + '/' + routePath;
+                else fullPath = (baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || '') + '/' + routePath;
 
                 // Add to the main router
                 this_.router.route(fullPath, fullPath, runMiddleware(route));
