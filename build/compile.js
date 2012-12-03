@@ -9,8 +9,8 @@ module.exports = function(grunt) {
       'mkdir {buildDir}',
       'find . -depth 1 | {exclusionGrep} | while read x; do cp -R $x ./build/${x}; done'
   ].join(' && ');
-  var compileToplevelCMD = 'jam compile -o ./build/jam/require.js --no-minify';
-  var compileAppCMD = 'jam compile -i {appPath} -e requireLib {otherExclusions} -o ./build/{appPath}.js --no-minify';
+  var compileToplevelCMD = 'jam compile -o ./build/jam/require.js';
+  var compileAppCMD = 'jam compile -i {appPath} -i {routerPath} -e requireLib {otherExclusions} -o ./build/{appPath}.js';
 
   grunt.task.registerTask('compile', 'Builds an application radagast suite with jam and requirejs.', function () {
     var options = grunt.config(this.name) || {};
@@ -20,13 +20,28 @@ module.exports = function(grunt) {
     options.buildExclude = (options.buildExclude) ? [].concat(options.buildExclude) : [];
     options.buildExclude.push('./build'); // just in case (doesnt hurt to have duplicates)
 
+    // flags
+    if (this.flags['no-minify']) {
+      compileToplevelCMD += ' --no-minify';
+      compileAppCMD      += ' --no-minify';
+    }
+
     // prepare data
     var buildExcludeGrep = options.buildExclude.map(function(e) { return 'grep -v "' + e + '"'; }).join('|');
     buildDirCMD = buildDirCMD
       .replace(/\{buildDir\}/g, options.buildDir)
       .replace(/\{exclusionGrep\}/g, buildExcludeGrep);
     var appPaths = collectAppPaths(options.apps);
-    compileAppCMD = appPaths.map(function(p) { return compileAppCMD.replace(/\{appPath\}/g, p); }).join(' && ');
+    // :DEBUG: including the package.js in core is causing more problems than I think it's worth
+    /*compileToplevelCMD = compileToplevelCMD.replace(/\{includes\}/g,
+      appPaths.map(function(p) { return '-i ' + p.base + '/package'; }).join(' ')
+    );*/
+    compileAppCMD = appPaths.map(function(p) {
+      return compileAppCMD
+        .replace(/\{appPath\}/g, p.main)
+        .replace(/\{routerPath\}/g, p.router)
+      ;
+    }).join(' && ');
     
     // execute
     var done = this.async();
@@ -60,7 +75,11 @@ module.exports = function(grunt) {
         // the packages use a define call to export their config
         // this define function grabs that config and adds it to our modules
         var define = function(pkgFn) {
-          appPaths.push(path.join(app, pkgFn().path));
+          appPaths.push({
+            base   : app,
+            main   : path.join(app, pkgFn().path),
+            router : path.join(app, 'router')
+          });
         };
 
         // load the package js and eval it in this scope
