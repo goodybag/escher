@@ -3,8 +3,11 @@ define(function(require){
     // 3rd Party Dependencies
     $         = require('jquery')
   , _         = require('lodash')
-  , Backbone  = require('backbone')
   , domready  = require('domReady')
+    // tell requirejs that backbone is a dep, but use the global one
+    // (backbone's shim, when compiled, provides a bad value to require
+    //  so we're better off using the global)
+  , bb        = require('backbone')
 
     // Module Variables
   , utils     = {}
