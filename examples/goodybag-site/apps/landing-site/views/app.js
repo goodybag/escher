@@ -19,8 +19,8 @@ define(function(require){
 
   return rad.App.extend({
     regions: {
-      '.main-nav' :  new NavView()
-    , '.footer'   :  new FooterView()
+      '#nav' :  new NavView()
+    , '#footer'   :  new FooterView()
     }
 
   , pages: {

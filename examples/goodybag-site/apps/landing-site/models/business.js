@@ -4,7 +4,8 @@ define(function(require){
   ;
 
   return utils.Model.extend({
-    defaults:{
+  	idAttribute: "_id"
+  , defaults:{
       publicName:'Public Name'
     }
   });

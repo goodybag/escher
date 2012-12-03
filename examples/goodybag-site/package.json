@@ -11,7 +11,8 @@
 
   "jam": {
     "dependencies": {
-      "hbt": null
+      "hbt": null,
+      "fancybox": null
     }
   }
 }
