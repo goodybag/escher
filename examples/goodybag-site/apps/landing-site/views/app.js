@@ -1,15 +1,17 @@
 define(function(require){
   var
-    rad         = require('radagast')
-  , utils       = require('utils')
+    rad             = require('radagast')
+  , utils           = require('utils')
 
-  , NavView     = require('./nav')
-  , FooterView  = require('./footer')
-  , LandingView = require('./landing-page')
+    // Sub-views
+  , NavView         = require('./nav')
+  , FooterView      = require('./footer')
+  , LandingView     = require('./landing-page')
+  , CharitiesView   = require('./charities-page')
 
-  , template    = require('hbt!./../html/app')
+  , template        = require('hbt!./../html/app')
 
-  , logger      = new rad.logger("Landing Site")
+  , logger          = new rad.logger("Landing Site")
   ;
 
   return rad.App.extend({
@@ -19,14 +21,12 @@ define(function(require){
     }
 
   , pages: {
-      'landing': new LandingView()
+      'landing'   : new LandingView()
+    , 'charities' : new CharitiesView()
     }
 
   , initialize: function(){
-      var this_ = this, bound = function(fn){
-        return function(){ fn.apply(this_, arguments); }
-      };
-      rad.subscribe('landing.changePageRequest', bound(this.onChangePageRequest));
+      rad.subscribe('landing.changePageRequest', utils.bind(this.onChangePageRequest, this));
     }
 
   , render: function(){
@@ -52,6 +52,17 @@ define(function(require){
       if (this.currentPage === pageName) return logger.warn("Already on this page: ", pageName), this;
 
       logger.info("Changing to page: ", pageName);
+
+      rad.publish('landing.changePage.' + pageName);
+
+      if (pageName === "landing"){
+        utils.dom(document.body).addClass('index');
+
+        rad.publish('landing.footer.show');
+        rad.publish('landing.footer.exitSlideMode');
+      }else{
+        utils.dom(document.body).removeClass('index');
+      }
 
       if (this.currentPage) this.pages[this.currentPage].$el.css('display', 'none');
       this.pages[this.currentPage = pageName].$el.css('display', 'block');

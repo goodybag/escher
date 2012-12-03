@@ -20,6 +20,13 @@ define(function(require){
       this.animating = false;
       this.shown     = false;
 
+      // Setup a limited API
+      rad.subscribe('landing.footer.toggle',          utils.bind(this.toggle,         this));
+      rad.subscribe('landing.footer.show',            utils.bind(this.show,           this));
+      rad.subscribe('landing.footer.hide',            utils.bind(this.hide,           this));
+      rad.subscribe('landing.footer.enterSlideMode',  utils.bind(this.enterSlideMode, this));
+      rad.subscribe('landing.footer.exitSlideMode',   utils.bind(this.exitSlideMode,  this));
+
       return this;
     }
 

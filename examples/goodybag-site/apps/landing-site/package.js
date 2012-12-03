@@ -15,7 +15,7 @@ define(function(require){
     , "businesses":         "businesses"
   }
 
-  , baseUrl: 'landing'
+  , baseUrl: ''
 
   , apps: []
 

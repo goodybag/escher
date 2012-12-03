@@ -20,7 +20,7 @@ define(function(require){
     }
 
   , businesses: function(){
-      console.log('businesses');
+      rad.publish('landing.changePageRequest', 'businesses');
     }
   };
 });

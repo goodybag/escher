@@ -30,20 +30,22 @@ define(function(require){
     }
 
   , logoClick: function(e){
-      logger.info('[Nav] - logo click');
-      this.trigger('logo:click', this, e);
       e.preventDefault();
+      logger.info('Logo click');
     }
 
   , facebookLoginClick: function(e){
+      logger.info('Facebook click');
       this.trigger('logo:click', this, e);
     }
 
   , emailLoginClick: function(e){
+      logger.info('Email click');
       this.trigger('logo:click', this, e);
     }
 
   , signUpClick: function(e){
+      logger.info('Sign-Up click');
       this.trigger('logo:click', this, e);
     }
   });
