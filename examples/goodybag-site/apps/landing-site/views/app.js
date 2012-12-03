@@ -17,12 +17,12 @@ define(function(require){
   return rad.App.extend({
     regions: {
       '.main-nav' :  new NavView()
-    , '.footer'   :  new FooterView()
+    , '.footer'   :  new FooterView({ prefix: 'landing' })
     }
 
   , pages: {
-      'landing'   : new LandingView()
-    , 'charities' : new CharitiesView()
+      'landing'   :  new LandingView()
+    , 'charities' :  new CharitiesView()
     }
 
   , initialize: function(){
