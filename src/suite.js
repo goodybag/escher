@@ -141,6 +141,7 @@ define(function(require){
                 if (routePath === '') fullPath = baseUrl + childApp.baseUrl;
                 else if (baseUrl === '') fullPath = (childApp.baseUrl || '') + '/' + routePath;
                 else fullPath = (baseUrl ? (baseUrl + '/') : '') + (childApp.baseUrl || '') + '/' + routePath;
+                if (fullPath.charAt(0) == '/') { fullPath = fullPath.slice(1); }
 
                 // Add to the main router
                 this_.router.route(fullPath, fullPath, runMiddleware(route));
