@@ -1,15 +1,25 @@
 define(function(require){
   var
-    utils   = require('utils')
-  , config  = require('config')
+    utils    = require('utils')
+  , Business = require('./../models/business')
   ;
 
-  return new utils.Collection.extend({
-    url: config.apiUrl + "businesses"
+  return utils.Collection.extend({
+    model: Business
+  , url: "http://www.goodybag.com/api/consumers/participatingBusinesses"
+
+  , parse: function(resp, xhr) {
+    return resp && resp.data;
+  }
+
+  , comparator: function(business) {
+    return business.get('publicName');
+  }
 
   , search: function(input){
+      input = input.toLowerCase();
       return this.filter(function(model){
-        return model.get('name').indexOf(input) > -1;
+        return model.get('publicName').toLowerCase().indexOf(input) > -1;
       });
     }
   });

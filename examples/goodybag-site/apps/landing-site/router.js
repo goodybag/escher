@@ -22,5 +22,13 @@ define(function(require){
   , businesses: function(){
       rad.publish('landing.changePageRequest', 'businesses');
     }
+
+  , privacy: function(){
+      rad.publish('landing.changePageRequest', 'privacy');
+    }
+
+  , legal: function(){
+      rad.publish('landing.changePageRequest', 'legal');
+    }
   };
 });

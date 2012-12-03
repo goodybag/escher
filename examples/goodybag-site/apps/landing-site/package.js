@@ -13,6 +13,8 @@ define(function(require){
       "":                   "landing"
     , "charities":          "charities"
     , "businesses":         "businesses"
+    , "privacy":            "privacy"
+    , "legal":              "legal"
   }
 
   , baseUrl: ''
