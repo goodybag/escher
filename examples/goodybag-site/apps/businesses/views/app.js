@@ -40,7 +40,7 @@ define(function(require){
       this.renderBusinesses();
     }
 
-  , renderBusinesses : function() {
+  , renderBusinesses: function() {
       var businesses = this.businesses;
 
       if (this.businessesFilter) {
