@@ -1,6 +1,6 @@
-# Radagast - A front-end web application architecture framework built on top of Backbone
+# Escher - Apps within apps within apps...
 
-I think we'll change the name, but Radagast seeks to help create large-scale, well-separated backbone apps with an emphasis on lazy-loading. The goal is to provide abstractions to break your application into tiny applications. Once the separate small applications are built, a large main app or suite can be composed from the smaller pieces.
+Escher seeks to help create large-scale, well-separated backbone apps with an emphasis on lazy-loading. The goal is to provide abstractions to break your application into tiny applications. Once the separate small applications are built, a large main app or suite can be composed from the smaller pieces.
 
 ## Design Goals
 
