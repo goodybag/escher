@@ -1,15 +1,15 @@
 define(function(require){
-  var pubsub = require('radagast/src/pubsub');
+  var pubsub = require('escher/src/pubsub');
 
-  var Radagast = {
+  var Escher = {
     // imported APIs
-    utils       : require('radagast/src/utils')
-  , apps        : require('radagast/src/apps-handler')
-  , App         : require('radagast/src/app')
-  , Suite       : require('radagast/src/suite')
-  , logger      : require('radagast/src/logger')
-  , config      : require('radagast/src/config')
-  , css         : require('radagast/src/css')
+    utils       : require('escher/src/utils')
+  , apps        : require('escher/src/apps-handler')
+  , App         : require('escher/src/app')
+  , Suite       : require('escher/src/suite')
+  , logger      : require('escher/src/logger')
+  , config      : require('escher/src/config')
+  , css         : require('escher/src/css')
   , publish     : pubsub.publish
   , subscribe   : pubsub.subscribe
   , unsubscribe : pubsub.unsubscribe
@@ -25,27 +25,27 @@ define(function(require){
     cb = cb || fallback_cb;
 
     // register apps
-    Radagast.apps.add(Radagast.config.apps, function(){
-      Radagast.apps.get(app_name, function(error, AppCtor){
+    Escher.apps.add(Escher.config.apps, function(){
+      Escher.apps.get(app_name, function(error, AppCtor){
         if (error) return cb(error);
         // load the main application
-        Radagast.mainApp = new AppCtor({ el:Radagast.config.el });
-        Radagast.mainApp.render();
-        Radagast.mainApp.initApps(function(){
+        Escher.mainApp = new AppCtor({ el:Escher.config.el });
+        Escher.mainApp.render();
+        Escher.mainApp.initApps(function(){
 
-          Radagast.utils.domready(function(){
+          Escher.utils.domready(function(){
 
             // inject the suite into the dom, if needed
-            if (typeof Radagast.config.el === 'undefined') {
-              var $el = Radagast.utils.dom(document.body);
-              $el.append(Radagast.mainApp.$el);
+            if (typeof Escher.config.el === 'undefined') {
+              var $el = Escher.utils.dom(document.body);
+              $el.append(Escher.mainApp.$el);
             }
 
             // start listening to navigation changes
-            Radagast.utils.Backbone.history.start();
+            Escher.utils.Backbone.history.start();
 
             // away we go
-            cb(undefined, Radagast.mainApp);
+            cb(undefined, Escher.mainApp);
           });
         });
       });
@@ -56,5 +56,5 @@ define(function(require){
     if (err) throw err;
   }
 
-  return Radagast;
+  return Escher;
 });
