@@ -1,5 +1,6 @@
 define(function(require){
   var
+    rad              = require('radagast')
     utils            = require('utils')
   , Businesses       = require('./../collections/businesses')
   ;                    require('fancybox');
@@ -11,7 +12,7 @@ define(function(require){
   , requestedModal : require('hbt!./../html/modals/business-requested')
   };
 
-  return utils.View.extend({
+  return rad.App.extend({
     businesses: null
   , businessesFilter: null
 

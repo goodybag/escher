@@ -7,7 +7,6 @@ define(function(require){
   , NavView         = require('./nav')
   , FooterView      = require('./footer')
   , LandingView     = require('./landing-page')
-  , BusinessesView  = require('./businesses-page')
   , CharitiesView   = require('./charities-page')
   , LegalView       = require('./legal-page')
   , PrivacyView     = require('./privacy-page')
@@ -25,7 +24,6 @@ define(function(require){
 
   , pages: {
       'landing'    : new LandingView()
-    , 'businesses' : new BusinessesView()
     , 'charities'  : new CharitiesView()
     , 'privacy'    : new PrivacyView()
     , 'legal'      : new LegalView()

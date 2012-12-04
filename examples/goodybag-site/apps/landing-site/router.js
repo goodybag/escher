@@ -19,10 +19,6 @@ define(function(require){
       rad.publish('landing.changePageRequest', 'charities');
     }
 
-  , businesses: function(){
-      rad.publish('landing.changePageRequest', 'businesses');
-    }
-
   , privacy: function(){
       rad.publish('landing.changePageRequest', 'privacy');
     }

@@ -14,7 +14,9 @@ define(function(require){
       '': [
         'landing-site'
       , 'consumer-panel'
+      , 'businesses'
       ]
+    , '#footer': new FooterView()
     }
   });
 });
