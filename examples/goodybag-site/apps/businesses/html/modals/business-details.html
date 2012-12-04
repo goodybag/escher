@@ -1,0 +1,37 @@
+<div id="business-details" class="lightbox">
+<a href="#" class="close">close</a>
+<div class="heading">
+  <div class="holder">
+    <h2>{{name}} <span>({{locations_summary}})</span></h2>
+  </div>
+</div>
+<div class="lightbox-content">
+  <div class="businesses-block">
+    <ul class="contacts-list">
+      {{#each locations}}
+      <li>
+        <address>
+          <strong>{{this.name}}</strong>
+          <span>{{this.street1}} {{this.street2}}, {{this.city}}, {{this.state}}, {{this.zip}}</span>
+          <span>{{this.phone}}</span>
+          <span><a href="#">Google Map</a></span>
+        </address>
+      </li>
+      {{/each}}
+    </ul>
+  </div>
+  <div class="info-block">
+    <a href="#" class="visual">
+      <img class="details-logo" src="{{thumb}}" width="140" height="140" alt="{{name}}" />
+    </a>
+    {{#if tags}}
+      <ul class="tags">
+        {{#each tags}}
+        <li><a href="#"><span>{{this}}</span></a></li>
+        {{/each}}
+      </ul>
+    {{/if}}
+    <a href="{{website}}" class="website" target="_blank">visit website</a>
+  </div>
+</div>
+</div>

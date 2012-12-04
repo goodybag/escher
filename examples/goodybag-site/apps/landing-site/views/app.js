@@ -4,10 +4,10 @@ define(function(require){
   , utils           = require('utils')
 
     // Sub-views
-  , NavView         = require('./nav')
-  , FooterView      = require('./footer')
   , LandingView     = require('./landing-page')
   , CharitiesView   = require('./charities-page')
+  , LegalView       = require('./legal-page')
+  , PrivacyView     = require('./privacy-page')
 
   , template        = require('hbt!./../html/app')
 
@@ -16,23 +16,23 @@ define(function(require){
 
   return rad.App.extend({
     regions: {
-      '.main-nav' :  new NavView()
-    , '.footer'   :  new FooterView({ prefix: 'landing' })
     }
 
   , pages: {
-      'landing'   :  new LandingView()
-    , 'charities' :  new CharitiesView()
+      'landing'    : new LandingView()
+    , 'charities'  : new CharitiesView()
+    , 'privacy'    : new PrivacyView()
+    , 'legal'      : new LegalView()
     }
 
   , initialize: function(){
+      this.on('app.show', this.showApp, this);
+      this.on('app.hide', this.hideApp, this);
       rad.subscribe('landing.changePageRequest', utils.bind(this.onChangePageRequest, this));
     }
 
   , render: function(){
-      this.$el.html(template());
-
-      var $pages = this.$el.find('.pages'), page;
+      var $pages = this.$el;
 
       for (var key in this.pages){
         page = this.pages[key];
@@ -41,6 +41,20 @@ define(function(require){
         $pages.append(page.$el);
       }
     }
+
+  , showApp: function() {
+      utils.dom(document.body).addClass('index');
+
+      rad.publish('footer.show');
+      rad.publish('footer.exitSlideMode');
+  }
+
+  , hideApp: function() {
+      utils.dom(document.body).removeClass('index');
+
+      rad.publish('footer.enterSlideMode');
+      rad.publish('footer.hide');
+  }
 
   , onChangePageRequest: function(channel, page){
       return this.changePage(page);
@@ -58,11 +72,11 @@ define(function(require){
       if (pageName === "landing"){
         utils.dom(document.body).addClass('index');
 
-        rad.publish('landing.footer.show');
-        rad.publish('landing.footer.exitSlideMode');
+        rad.publish('footer.show');
+        rad.publish('footer.exitSlideMode');
       }else{
         utils.dom(document.body).removeClass('index');
-        rad.publish('landing.footer.enterSlideMode');
+        rad.publish('footer.enterSlideMode');
       }
 
       if (this.currentPage) this.pages[this.currentPage].$el.css('display', 'none');

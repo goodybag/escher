@@ -17,6 +17,7 @@ define(function(require){
   , apps: [
       'defer!landing-site'
     , 'defer!consumer-panel'
+    , 'defer!businesses'
     ]
 
   , prerequisites: []

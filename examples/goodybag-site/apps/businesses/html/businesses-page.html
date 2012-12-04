@@ -9,16 +9,16 @@
       <div class="section-holder">
         <div class="forms-box">
           <div class="box-holder">
-            <form action="#">
+            <form onsubmit="javascript:return false;">
               <fieldset>
                 <label for="business-name">Business search:</label>
                 <div class="row">
                   <input type="search" placeholder="Type business name here" id="business-name" />
-                  <div class="submit"><input type="submit" value="SEARCH" /></div>
+                  <!--<div class="submit"><input type="submit" value="SEARCH" /></div>-->
                 </div>
               </fieldset>
             </form>
-            <form action="#" class="request">
+            <form class="request" onsubmit="javascript:return false;">
               <fieldset>
                 <label for="business-name2">Request your favorite business to join the club:</label>
                 <div class="row">
@@ -35,11 +35,6 @@
   </div>
   <div class="items">
     <span class="note">- Click on a business below for more info -</span>
-    <ul class="items-list" id="business-list">
-      <!-- Businesses list -->
-    </ul>
-    <div class="ajax-holder">
-      <a href="inc/post01.html" class="hidden">&nbsp;</a>
-    </div>
+    <ul class="items-list"> <!-- business logos will be loaded here --></ul>
   </div>
 </section>

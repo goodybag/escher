@@ -128,8 +128,12 @@ define(function(require){
 
     if (this.appName.indexOf(appName) === -1) return logger.error("Can't find appliction: " + appName), this;
 
-    if (this.current) this.current.$el.css('display', 'none');
+    if (this.current) {
+      this.current.$el.css('display', 'none');
+      this.current.trigger('app.hide');
+    }
     this.current = this.getApp(appName);
+    this.current.trigger('app.show');
     this.current.$el.css('display', 'block');
 
     return this;

@@ -12,7 +12,8 @@ define(function(require){
   , routes: {
       "":                   "landing"
     , "charities":          "charities"
-    , "businesses":         "businesses"
+    , "privacy":            "privacy"
+    , "legal":              "legal"
   }
 
   , baseUrl: ''
