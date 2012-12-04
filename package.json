@@ -1,8 +1,8 @@
 {
-  "name": "radagast",
+  "name": "escher",
   "version": "0.1.0",
   "description": "A front-end web application architecture framework built on top of Backbone",
-  "main": "src/radagast.js",
+  "main": "src/escher.js",
   "directories": {
     "example": "examples"
   },
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/goodybag/radagast.git"
+    "url": "git://github.com/goodybag/escher.git"
   },
   "keywords": [
     "backbone",
@@ -23,7 +23,6 @@
     "dependencies": {
       "domReady": null,
       "backbone": null
-    },
-    "main": "src/radagast.js"
+    }
   }
 }
