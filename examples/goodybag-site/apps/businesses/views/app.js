@@ -90,7 +90,7 @@ define(function(require){
       this.$requestedBusinessName.val('');
 
       // submit to the service
-      $.post("http://www.goodybag.com/api/consumers/businessRequests", data);
+      utils.dom.post("http://www.goodybag.com/api/consumers/businessRequests", data);
 
       // thank you, come again
       this.openModal(templates.requestedModal());

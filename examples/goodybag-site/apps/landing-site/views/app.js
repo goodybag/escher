@@ -51,7 +51,7 @@ define(function(require){
 
   , hideApp: function() {
       utils.dom(document.body).removeClass('index');
-      
+
       rad.publish('footer.enterSlideMode');
       rad.publish('footer.hide');
   }
@@ -69,7 +69,7 @@ define(function(require){
 
       rad.publish('landing.changePage.' + pageName);
 
-      /*if (pageName === "landing"){
+      if (pageName === "landing"){
         utils.dom(document.body).addClass('index');
 
         rad.publish('footer.show');
@@ -77,7 +77,7 @@ define(function(require){
       }else{
         utils.dom(document.body).removeClass('index');
         rad.publish('footer.enterSlideMode');
-      }*/
+      }
 
       if (this.currentPage) this.pages[this.currentPage].$el.css('display', 'none');
       this.pages[this.currentPage = pageName].$el.css('display', 'block');
