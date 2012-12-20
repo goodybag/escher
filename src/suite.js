@@ -51,9 +51,10 @@ define(function(require){
             var self = this, index = -1;
             currentApp = this_;
             var next = function() {
-              return middleware[++index].apply(self, (index < middleware.length - 1) ? nextArgs : arguments);
+              return middleware[++index].apply(self, (index < middleware.length - 1) ? nextArgs : orgArgs);
             };
-            var nextArgs = Array.prototype.concat.call(arguments, next);
+            var orgArgs = Array.prototype.slice.call(arguments);
+            var nextArgs = orgArgs.concat(next);
             next();
           }
         }
