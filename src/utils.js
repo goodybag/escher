@@ -2,7 +2,7 @@ define(function(require){
    var
     // 3rd Party Dependencies
     $         = require('jquery')
-  , _         = require('underscore')
+  , _         = require('underscore') || _ // In case it exists as a global already use that
   , domready  = require('domReady')
     // tell requirejs that backbone is a dep, but use the global one
     // (backbone's shim, when compiled, provides a bad value to require

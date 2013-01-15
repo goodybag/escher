@@ -1,6 +1,6 @@
 {
   "name": "escher",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A front-end web application architecture framework built on top of Backbone",
   "main": "src/escher.js",
   "directories": {
